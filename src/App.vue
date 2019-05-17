@@ -49,7 +49,7 @@ export default {
     }
   },
   created: function() {
-    baiduStatistics.init("6486ef85945d21b1aee45fa400d1c7a7");
+    baiduStatistics.init("abcdefg");
     baiduStatistics.output();
     baiduStatistics.push("h5-tmpl-vue", "test");
   },
