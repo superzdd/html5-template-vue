@@ -53,8 +53,8 @@ export default {
             this.loadPercent = Math.floor(num);
           },
           () => {
-            store.pageIndex++;
-            store.testArr.push("1");
+            store.state.pageIndex++;
+            store.state.testArr.push("1");
           }
         );
     }

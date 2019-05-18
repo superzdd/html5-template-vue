@@ -28,7 +28,7 @@ export default {
   },
   data: function() {
     return {
-      sharedState: store
+      sharedState: store.state
     };
   },
   computed: {
@@ -56,10 +56,10 @@ export default {
   methods: {
     page1click() {
       // store.setPageIndexAdd();
-      store.pageIndex++;
+      store.state.pageIndex++;
     },
     page4click() {
-      store.pageIndex = 1;
+      store.state.pageIndex = 1;
     }
   }
 };
