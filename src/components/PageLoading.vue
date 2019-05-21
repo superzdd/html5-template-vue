@@ -18,7 +18,7 @@ export default {
   },
   data() {
     return {
-      sharedState: store,
+      sharedState: store.state,
       loadPercent: 0,
       publicPath: process.env.BASE_URL,
       imageBgSrc: "imgs/bg-loading.jpg"

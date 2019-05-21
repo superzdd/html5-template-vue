@@ -11,11 +11,13 @@
     <BasePage v-if="page4Show" v-on:commonclick="page4click">
       <div class="page4-bg">this is page 4, click back to page1</div>
     </BasePage>
+    <MusicButton></MusicButton>
   </div>
 </template>
 
 <script>
 import BasePage from "./components/BasePage.vue";
+import MusicButton from "./components/MusicButton.vue";
 import PageLoading from "./components/PageLoading.vue";
 import baiduStatistics from "./util/baidu-statistics.js";
 import store from "./util/store-proxy.js";
@@ -24,7 +26,8 @@ export default {
   name: "app",
   components: {
     BasePage,
-    PageLoading
+    PageLoading,
+    MusicButton
   },
   data: function() {
     return {
@@ -52,6 +55,7 @@ export default {
     baiduStatistics.init("abcdefg");
     baiduStatistics.output();
     baiduStatistics.push("h5-tmpl-vue", "test");
+    store.setBackgroundMusicPlaying();
   },
   methods: {
     page1click() {

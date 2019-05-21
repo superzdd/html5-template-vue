@@ -23,6 +23,13 @@ var store = {
             process.env.BASE_URL + 'imgs/12.jpg'
         ],
         testArr: [],
+        backgrundMusicIsPlaying: false,
+    },
+    setBackgroundMusicPause(){
+        this.state.backgrundMusicIsPlaying = false;
+    },
+    setBackgroundMusicPlaying() {
+        this.state.backgrundMusicIsPlaying = true;
     }
 };
 
