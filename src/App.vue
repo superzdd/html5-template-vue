@@ -1,17 +1,20 @@
 <template>
   <div id="app page">
     <PageLoading v-if="pageLoadingShow"></PageLoading>
-    <BasePage v-if="page1Show" v-on:commonclick="page1click"></BasePage>
-    <BasePage v-if="page2Show" v-on:commonclick="page1click">
+    <BasePage v-if="page1Show" @commonclick="page1click"></BasePage>
+    <BasePage v-if="page2Show" @commonclick="page1click">
       <div class="page2-bg">this is page 2, click go to next page</div>
     </BasePage>
-    <BasePage v-if="page3Show" v-on:commonclick="page1click">
+    <BasePage v-if="page3Show" @commonclick="page1click">
       <div class="page3-bg">this is page 3, click go to next page</div>
     </BasePage>
-    <BasePage v-if="page4Show" v-on:commonclick="page4click">
+    <BasePage v-if="page4Show" @commonclick="page4click">
       <div class="page4-bg">this is page 4, click back to page1</div>
     </BasePage>
-    <MusicButton></MusicButton>
+    <MusicButton
+      @backgroundMusicPause="backgroundMusicPauseHandler"
+      @backgroundMusicPlay="backgroundMusicPlayHandler"
+    ></MusicButton>
   </div>
 </template>
 
@@ -20,7 +23,7 @@ import BasePage from "./components/BasePage.vue";
 import MusicButton from "./components/MusicButton.vue";
 import PageLoading from "./components/PageLoading.vue";
 import baiduStatistics from "./util/baidu-statistics.js";
-import store from "./util/store-proxy.js";
+import navi from "./util/nav-controller.js";
 
 export default {
   name: "app",
@@ -31,7 +34,11 @@ export default {
   },
   data: function() {
     return {
-      sharedState: store.state
+      sharedState: window.store.state,
+      backgroundInfo: {
+        loadComplete: false, // 背景音乐素材是否加载完毕
+        instance: null // 背景音乐实例
+      }
     };
   },
   computed: {
@@ -52,18 +59,80 @@ export default {
     }
   },
   created: function() {
-    baiduStatistics.init("abcdefg");
-    baiduStatistics.output();
-    baiduStatistics.push("h5-tmpl-vue", "test");
-    store.setBackgroundMusicPlaying();
+    this.initBadiduStatistics();
+
+    this.initBackgroundMusic();
   },
   methods: {
     page1click() {
-      // store.setPageIndexAdd();
-      store.state.pageIndex++;
+      // window.store.setPageIndexAdd();
+      window.store.state.pageIndex++;
     },
     page4click() {
-      store.state.pageIndex = 1;
+      window.store.state.pageIndex = 1;
+    },
+    startPlayBackgroundMusic(app) {
+      window.createjs.Sound.registerSound("/imgs/bgmusic.mp3", "sound"); // 注意,这句registerSound必须写在WeixinJSBridgeReady回调函数内才行,否则下方createjs.Sound.play就会无效
+      let intervalInstance = setInterval(function() {
+        if (app.backgroundInfo.loadComplete) {
+          clearInterval(intervalInstance);
+          console.log("play");
+          app.backgroundInfo.instance = window.createjs.Sound.play("sound");
+          window.store.setBackgroundMusicPlaying();
+        }
+      }, 10);
+    },
+    initBackgroundMusic() {
+      window.createjs.Sound.alternateExtensions = ["mp3"];
+      window.createjs.Sound.on("fileload", loadHandler, this);
+
+      function loadHandler(event) {
+        console.log(`music load complete: ${JSON.stringify(event)}`);
+        this.backgroundInfo.loadComplete = true;
+      }
+
+      let appInstance = this;
+
+      // function startPlayBackgroundMusic() {
+      //   window.createjs.Sound.registerSound("/imgs/bgmusic.mp3", "sound"); // 注意,这句registerSound必须写在WeixinJSBridgeReady回调函数内才行,否则下方createjs.Sound.play就会无效
+      //   let intervalInstance = setInterval(function() {
+      //     if (appInstance.backgroundInfo.loadComplete) {
+      //       clearInterval(intervalInstance);
+      //       console.log("play");
+      //       appInstance.backgroundInfo.instance = window.createjs.Sound.play(
+      //         "sound"
+      //       );
+      //       window.store.setBackgroundMusicPlaying();
+      //     }
+      //   }, 10);
+      // }
+      if (navi.isWX) {
+        document.addEventListener(
+          "WeixinJSBridgeReady",
+          () => {
+            console.log("WeixinJSBridgeReady");
+            // startPlayBackgroundMusic();
+            this.startPlayBackgroundMusic(appInstance);
+          },
+          false
+        );
+      } else {
+        // startPlayBackgroundMusic();
+        this.startPlayBackgroundMusic(appInstance);
+      }
+    },
+    initBadiduStatistics() {
+      baiduStatistics.init("abcdefg");
+      baiduStatistics.output();
+      baiduStatistics.push("h5-tmpl-vue", "test");
+    },
+    backgroundMusicPauseHandler() {
+      window.store.setBackgroundMusicPause();
+      this.backgroundInfo.instance.paused = true;
+    },
+    backgroundMusicPlayHandler() {
+      window.store.setBackgroundMusicPlaying();
+      this.backgroundInfo.instance.paused = false;
     }
   }
 };

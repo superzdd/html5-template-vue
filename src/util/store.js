@@ -1,4 +1,4 @@
-var store = {
+let store = {
     debug: true,
     state: {
         message: 'Hello!',
@@ -20,34 +20,49 @@ var store = {
             process.env.BASE_URL + 'imgs/9.jpg',
             process.env.BASE_URL + 'imgs/10.jpg',
             process.env.BASE_URL + 'imgs/11.jpg',
-            process.env.BASE_URL + 'imgs/12.jpg',
-            process.env.BASE_URL + 'imgs/13.jpg',
-            process.env.BASE_URL + 'imgs/14.jpg',
-            process.env.BASE_URL + 'imgs/15.jpg',
-            process.env.BASE_URL + 'imgs/16.jpg',
-            process.env.BASE_URL + 'imgs/17.jpg',
-            process.env.BASE_URL + 'imgs/18.jpg',
-            process.env.BASE_URL + 'imgs/19.jpg',
-            process.env.BASE_URL + 'imgs/20.jpg'
+            process.env.BASE_URL + 'imgs/12.jpg'
         ],
+        testArr: [],
+        backgrundMusicIsPlaying: false,
     },
-    setMessageAction(newValue) {
-        if (this.debug) console.log('setMessageAction triggered with', newValue);
-        this.state.message = newValue;
+    setBackgroundMusicPause() {
+        this.state.backgrundMusicIsPlaying = false;
     },
-    clearMessageAction() {
-        if (this.debug) console.log('clearMessageAction triggered');
-        this.state.message = '';
-    },
-    setPageIndex(newValue) {
-        if (this.debug) console.log('setPageIndexAction triggered with', newValue);
-        this.state.pageIndex = newValue;
-    },
-    setPageIndexAdd() {
-        var newValue = this.state.pageIndex + 1;
-        if (this.debug) console.log('setPageIndexAction triggered with', newValue);
-        this.state.pageIndex = newValue;
+    setBackgroundMusicPlaying() {
+        this.state.backgrundMusicIsPlaying = true;
     }
 };
+
+let handler = {
+    get: function (target, prop) {
+        // if(store.debug){
+        // 	console.log(`store get:target: ${JSON.stringify(target)}, prop: ${prop}`);
+        // }
+
+        return Reflect.get(target, prop);
+    },
+    set: function (target, prop, value) {
+        if (store.debug) {
+            console.log(`store set: prop: ${prop}, value: ${value}`);
+        }
+
+        return Reflect.set(...arguments);
+    }
+};
+
+let initStore = function (obj) {
+    for (let [key, value] of Object.entries(obj)) {
+        if (typeof value == 'object') {
+            obj[key] = new Proxy(value, handler);
+            initStore(value);
+        }
+    }
+
+    return new Proxy(obj, handler);
+}
+
+store.state = initStore(store.state);
+
+window.store = store;
 
 export default store;

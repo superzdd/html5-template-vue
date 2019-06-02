@@ -1,16 +1,12 @@
 <template>
   <BasePage>
-    <div
-      class="bg abs page"
-      v-bind:style="{backgroundImage: finalImageSrcBg}"
-    >Loading {{loadPercent}}%</div>
+    <div class="bg abs page" :style="{backgroundImage: finalImageSrcBg}">Loading {{loadPercent}}%</div>
   </BasePage>
 </template>
 
 <script>
 import BasePage from "./BasePage.vue";
 import imageLoad from "../util/image-load.js";
-import store from "../util/store-proxy.js";
 export default {
   name: "pageLoading",
   components: {
@@ -18,7 +14,7 @@ export default {
   },
   data() {
     return {
-      sharedState: store.state,
+      sharedState: window.store.state,
       loadPercent: 0,
       publicPath: process.env.BASE_URL,
       imageBgSrc: "imgs/bg-loading.jpg"
@@ -53,8 +49,8 @@ export default {
             this.loadPercent = Math.floor(num);
           },
           () => {
-            store.state.pageIndex++;
-            store.state.testArr.push("1");
+            window.store.state.pageIndex++;
+            // window.store.state.testArr.push("1");
           }
         );
     }

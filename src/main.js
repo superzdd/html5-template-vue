@@ -1,5 +1,9 @@
 import Vue from 'vue'
 import App from './App.vue'
+// eslint-disable-next-line no-unused-vars
+import soundjs from './util/soundjs'
+// eslint-disable-next-line no-unused-vars
+import store from "./util/store.js";
 
 Vue.config.productionTip = false
 

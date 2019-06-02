@@ -2,14 +2,12 @@
   <div
     class="music-button"
     :class="[sharedState.backgrundMusicIsPlaying?'playing':'paused']"
-    v-bind:style="{transform: rotateAngleDeg}"
+    :style="{transform: rotateAngleDeg}"
     @click="musicButtonClick"
   ></div>
 </template>
 
 <script>
-import store from "../util/store-proxy.js";
-
 const ROTATE_FPS = 1000 / 60; // 音符旋转帧率
 const ROTATE_PERIOD = 1500; // 音符旋转完整旋转一次的时间
 
@@ -20,7 +18,7 @@ export default {
       rotateAnglePerFrame:
         Math.round((360 / ROTATE_PERIOD) * ROTATE_FPS * 100) / 100,
       lastRotateTime: 0,
-      sharedState: store.state,
+      sharedState: window.store.state,
       rotateAngle: 0
     };
   },
@@ -32,10 +30,10 @@ export default {
   methods: {
     musicButtonClick: function() {
       if (this.sharedState.backgrundMusicIsPlaying) {
-        store.setBackgroundMusicPause();
+        window.store.setBackgroundMusicPause();
         this.$emit("backgroundMusicPause");
       } else {
-        store.setBackgroundMusicPlaying();
+        window.store.setBackgroundMusicPlaying();
         this.$emit("backgroundMusicPlay");
       }
     },
