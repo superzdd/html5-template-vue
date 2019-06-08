@@ -2,7 +2,7 @@
   <div id="app page">
     <PageLoading v-if="pageLoadingShow"></PageLoading>
     <BasePage v-if="page1Show" @commonclick="page1click"></BasePage>
-    <BasePage v-if="page2Show" @commonclick="page1click">
+    <BasePage class="show-circle" v-if="page2Show" @commonclick="page1click">
       <div class="page2-bg">this is page 2, click go to next page</div>
     </BasePage>
     <BasePage v-if="page3Show" @commonclick="page1click">
@@ -24,6 +24,7 @@ import MusicButton from "./components/MusicButton.vue";
 import PageLoading from "./components/PageLoading.vue";
 import baiduStatistics from "./util/baidu-statistics.js";
 import navi from "./util/nav-controller.js";
+import { getWindowSize, makeRem750 } from "./util/rem.js";
 
 export default {
   name: "app",
@@ -60,8 +61,19 @@ export default {
   },
   created: function() {
     this.initBadiduStatistics();
-
     this.initBackgroundMusic();
+  },
+  mounted: function() {
+    const { width, height } = getWindowSize();
+    const remUtil = makeRem750();
+    // debugger;
+    console.log(
+      `mounted get params ${JSON.stringify({
+        width,
+        height,
+        remUtil
+      })}`
+    );
   },
   methods: {
     page1click() {
@@ -140,8 +152,8 @@ export default {
 
 <style lang="scss">
 @import url("./style/common.scss");
-
 #app {
+  --rem-height: 0rem;
   font-family: "Avenir", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -174,5 +186,18 @@ export default {
 .page4-bg {
   @extend .common-bg;
   background-image: url("/imgs/3.jpg");
+}
+
+.show-circle {
+  animation: clipCircleIn 1s linear forwards;
+}
+
+@keyframes clipCircleIn {
+  0% {
+    clip-path: circle(0 at 50% 50%);
+  }
+  100% {
+    clip-path: circle(100vh at 50% 50%);
+  }
 }
 </style>
