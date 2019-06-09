@@ -1,15 +1,17 @@
 <template>
   <div id="app page">
-    <PageLoading v-if="pageLoadingShow"></PageLoading>
-    <BasePage v-if="page1Show" @commonclick="page1click"></BasePage>
+    <PageLoading v-if="pageLoadingShow" @loadComplete="handleLoadComplete"></PageLoading>
+    <BasePage class="show-circle" v-if="page1Show" @commonclick="page1click">
+      <div class="page1-bg">Page 1, click go to next page</div>
+    </BasePage>
     <BasePage class="show-circle" v-if="page2Show" @commonclick="page1click">
-      <div class="page2-bg">this is page 2, click go to next page</div>
+      <div class="page2-bg">Page 2, click go to next page</div>
     </BasePage>
-    <BasePage v-if="page3Show" @commonclick="page1click">
-      <div class="page3-bg">this is page 3, click go to next page</div>
+    <BasePage class="show-circle" v-if="page3Show" @commonclick="page1click">
+      <div class="page3-bg">Page 3, click go to next page</div>
     </BasePage>
-    <BasePage v-if="page4Show" @commonclick="page4click">
-      <div class="page4-bg">this is page 4, click back to page1</div>
+    <BasePage class="show-circle" v-if="page4Show" @commonclick="page4click">
+      <div class="page4-bg">Page 4, click back to page1</div>
     </BasePage>
     <MusicButton
       @backgroundMusicPause="backgroundMusicPauseHandler"
@@ -19,12 +21,14 @@
 </template>
 
 <script>
+import baiduStatistics from "./util/baidu-statistics.js";
+import navi from "./util/nav-controller.js";
+import { getWindowSize } from "./util/rem.js";
+import pageManager from "./util/page-manager.js";
+
 import BasePage from "./components/BasePage.vue";
 import MusicButton from "./components/MusicButton.vue";
 import PageLoading from "./components/PageLoading.vue";
-import baiduStatistics from "./util/baidu-statistics.js";
-import navi from "./util/nav-controller.js";
-import { getWindowSize, makeRem750 } from "./util/rem.js";
 
 export default {
   name: "app",
@@ -39,49 +43,50 @@ export default {
       backgroundInfo: {
         loadComplete: false, // 背景音乐素材是否加载完毕
         instance: null // 背景音乐实例
-      }
+      },
+      pageManager // 页面跳转管理器
     };
   },
   computed: {
     pageLoadingShow: function() {
-      return this.sharedState.pageIndex == 0;
+      return this.pageManager.isPageVisible(0);
     },
     page1Show: function() {
-      return this.sharedState.pageIndex == 1;
+      return this.pageManager.isPageVisible(1);
     },
     page2Show: function() {
-      return this.sharedState.pageIndex == 2;
+      return this.pageManager.isPageVisible(2);
     },
     page3Show: function() {
-      return this.sharedState.pageIndex == 3;
+      return this.pageManager.isPageVisible(3);
     },
     page4Show: function() {
-      return this.sharedState.pageIndex == 4;
+      return this.pageManager.isPageVisible(4);
     }
   },
   created: function() {
+    this.pageManager.turnToPage(0);
     this.initBadiduStatistics();
     this.initBackgroundMusic();
   },
   mounted: function() {
     const { width, height } = getWindowSize();
-    const remUtil = makeRem750();
-    // debugger;
-    console.log(
-      `mounted get params ${JSON.stringify({
-        width,
-        height,
-        remUtil
-      })}`
+
+    document.body.style.setProperty("--px-height", height + "px");
+    document.body.style.setProperty(
+      "--circle-radius",
+      Math.ceil(Math.sqrt(height * height + width * width) * 100) / 100 + "px"
     );
   },
   methods: {
+    handleLoadComplete() {
+      this.pageManager.turnToPage(1, 500);
+    },
     page1click() {
-      // window.store.setPageIndexAdd();
-      window.store.state.pageIndex++;
+      this.pageManager.turnToNextPageAutomatically();
     },
     page4click() {
-      window.store.state.pageIndex = 1;
+      this.pageManager.turnToPage(1, 2000);
     },
     startPlayBackgroundMusic(app) {
       window.createjs.Sound.registerSound("/imgs/bgmusic.mp3", "sound"); // 注意,这句registerSound必须写在WeixinJSBridgeReady回调函数内才行,否则下方createjs.Sound.play就会无效
@@ -152,8 +157,13 @@ export default {
 
 <style lang="scss">
 @import url("./style/common.scss");
-#app {
+body {
   --rem-height: 0rem;
+  --px-height: 0px;
+  --circle-radius: 0px;
+}
+
+#app {
   font-family: "Avenir", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -173,31 +183,36 @@ export default {
   background-size: cover;
 }
 
-.page2-bg {
+.page1-bg {
   @extend .common-bg;
   background-image: url("/imgs/1.jpg");
 }
 
-.page3-bg {
+.page2-bg {
   @extend .common-bg;
   background-image: url("/imgs/2.jpg");
 }
 
-.page4-bg {
+.page3-bg {
   @extend .common-bg;
   background-image: url("/imgs/3.jpg");
 }
 
+.page4-bg {
+  @extend .common-bg;
+  background-image: url("/imgs/4.jpg");
+}
+
 .show-circle {
-  animation: clipCircleIn 1s linear forwards;
+  animation: clipCircleIn 0.5s linear forwards;
 }
 
 @keyframes clipCircleIn {
   0% {
-    clip-path: circle(0 at 50% 50%);
+    clip-path: circle(0 at 0% 100%);
   }
   100% {
-    clip-path: circle(100vh at 50% 50%);
+    clip-path: circle(var(--circle-radius) at 0% 100%);
   }
 }
 </style>

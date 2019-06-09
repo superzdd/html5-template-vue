@@ -34,7 +34,6 @@ export default {
           this.preloadPercent = Math.floor(num);
         },
         () => {
-          //   store.setPageIndexAdd();
           this.startLoading();
         }
       );
@@ -49,8 +48,7 @@ export default {
             this.loadPercent = Math.floor(num);
           },
           () => {
-            window.store.state.pageIndex++;
-            // window.store.state.testArr.push("1");
+            this.$emit("loadComplete");
           }
         );
     }
@@ -61,14 +59,10 @@ export default {
 <style lang="scss">
 @import url("../style/common.scss");
 
-// $publicPath: process.env.BASE_URL;
-
 .bg {
   display: flex;
   justify-content: center;
   align-items: center;
-
-  //   background-image: url(/public/imgs/bg-loading.jpg);
   background-size: 100% 100%;
 }
 </style>

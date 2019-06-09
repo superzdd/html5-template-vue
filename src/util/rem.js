@@ -44,9 +44,13 @@ function getWindowSize() {
   };
 }
 
-function makeRem750() {
+function makeRem750(designWidth = 750) {
+  // chrome下最小字体是13px，所以不能用设计图的宽度来设定rem的宽度，比如设计图是640px,直接用640rem换算的话font-size就会过小，所以做*100处理
+  // 即 640px = 6.4rem
+  //    750px = 7.5rem
+
   let { width } = getWindowSize();
-  let unit = width / 750;
+  let unit = (width / designWidth) * 100;
   document.documentElement.style.fontSize = unit + "px";
   return unit;
 }
