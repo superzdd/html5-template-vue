@@ -89,7 +89,10 @@ export default {
       this.pageManager.turnToPage(1, 2000);
     },
     startPlayBackgroundMusic(app) {
-      window.createjs.Sound.registerSound("/imgs/bgmusic.mp3", "sound"); // 注意,这句registerSound必须写在WeixinJSBridgeReady回调函数内才行,否则下方createjs.Sound.play就会无效
+      window.createjs.Sound.registerSound(
+        process.env.BASE_URL + "imgs/bgmusic.mp3",
+        "sound"
+      ); // 注意,这句registerSound必须写在WeixinJSBridgeReady回调函数内才行,否则下方createjs.Sound.play就会无效
       let intervalInstance = setInterval(function() {
         if (app.backgroundInfo.loadComplete) {
           clearInterval(intervalInstance);
@@ -185,22 +188,22 @@ body {
 
 .page1-bg {
   @extend .common-bg;
-  background-image: url("/imgs/1.jpg");
+  background-image: url("../public/imgs/1.jpg");
 }
 
 .page2-bg {
   @extend .common-bg;
-  background-image: url("/imgs/2.jpg");
+  background-image: url("../public/imgs/2.jpg");
 }
 
 .page3-bg {
   @extend .common-bg;
-  background-image: url("/imgs/3.jpg");
+  background-image: url("../public/imgs/3.jpg");
 }
 
 .page4-bg {
   @extend .common-bg;
-  background-image: url("/imgs/4.jpg");
+  background-image: url("../public/imgs/4.jpg");
 }
 
 .show-circle {

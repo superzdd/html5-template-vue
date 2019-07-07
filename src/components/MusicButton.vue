@@ -74,12 +74,12 @@ export default {
 }
 
 .playing {
-  background: url(/imgs/music-open.png) center center no-repeat;
+  background: url(../../public/imgs/music-open.png) center center no-repeat;
   background-size: 100% 100%;
 }
 
 .paused {
-  background: url(/imgs/music-open.png) center center no-repeat;
+  background: url(../../public/imgs/music-open.png) center center no-repeat;
   background-size: 100% 100%;
 }
 

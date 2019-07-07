@@ -69,7 +69,7 @@ npm audit fix
 
 2. 页面运行后无法加载 js 文件，观察 chrome 的 source 中的 js 文件，发现都是`<!Doctype html>`文件，根本没有展示真正内容
 
-- publicPath 出的问题，因为这个项目现在是两层： `HTML%-TEMPLATE-VUE-V0.1 -> template-vue`，所以路径要是`./`
+- publicPath 出的问题，因为这个项目现在是两层： `HTML%-TEMPLATE-VUE-V0.1 -> template-vue`，所以路径要是`./`，在`vue.config.js`中写入一下内容
 
 ```js
 module.exports = {
