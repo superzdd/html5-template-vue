@@ -1,17 +1,25 @@
 <template>
   <div id="app page">
     <PageLoading v-if="pageLoadingShow" @loadComplete="handleLoadComplete"></PageLoading>
-    <BasePage class="show-circle" v-if="page1Show" @commonclick="page1click">
-      <div class="page1-bg">Page 1, click go to next page</div>
+    <BasePage :class="pageClass(1)" @commonclick="nextPageClick">
+      <div class="page1-bg">
+        <div class="page-hint">Page 1, click go to next page</div>
+      </div>
     </BasePage>
-    <BasePage class="show-circle" v-if="page2Show" @commonclick="page1click">
-      <div class="page2-bg">Page 2, click go to next page</div>
+    <BasePage :class="pageClass(2)" @commonclick="nextPageClick">
+      <div class="page2-bg">
+        <div class="page-hint">Page 2, click go to next page</div>
+      </div>
     </BasePage>
-    <BasePage class="show-circle" v-if="page3Show" @commonclick="page1click">
-      <div class="page3-bg">Page 3, click go to next page</div>
+    <BasePage :class="pageClass(3)" @commonclick="nextPageClick">
+      <div class="page3-bg">
+        <div class="page-hint">Page 3, click go to next page</div>
+      </div>
     </BasePage>
-    <BasePage class="show-circle" v-if="page4Show" @commonclick="page4click">
-      <div class="page4-bg">Page 4, click back to page1</div>
+    <BasePage :class="pageClass(4)" @commonclick="page4click">
+      <div class="page4-bg">
+        <div class="page-hint">Page 4, click back to page1</div>
+      </div>
     </BasePage>
     <MusicButton
       @backgroundMusicPause="backgroundMusicPauseHandler"
@@ -24,7 +32,7 @@
 import baiduStatistics from './util/baidu-statistics.js';
 import navi from './util/nav-controller.js';
 import { getWindowSize } from './util/rem.js';
-import pageManager from './util/page-manager.js';
+import pageTurningManager from './util/page-turning-manager.js';
 
 import BasePage from './components/BasePage.vue';
 import MusicButton from './components/MusicButton.vue';
@@ -44,29 +52,29 @@ export default {
                 loadComplete: false, // 背景音乐素材是否加载完毕
                 instance: null, // 背景音乐实例
             },
-            pageManager, // 页面跳转管理器
+            pageTurningManager, // 页面跳转管理器
         };
     },
     computed: {
         pageLoadingShow: function() {
-            return this.pageManager.isPageVisible(0);
+            return this.pageTurningManager.isCurrentPage(0);
         },
-        page1Show: function() {
-            return this.pageManager.isPageVisible(1);
-        },
-        page2Show: function() {
-            return this.pageManager.isPageVisible(2);
-        },
-        page3Show: function() {
-            return this.pageManager.isPageVisible(3);
-        },
-        page4Show: function() {
-            return this.pageManager.isPageVisible(4);
+        pageClass: function() {
+            return function(index) {
+                let ret = '';
+                if (this.pageTurningManager.isCurrentPage(index)) {
+                    ret = 'page-show';
+                } else if (this.pageTurningManager.isNextPage(index)) {
+                    ret = 'page-animate';
+                } else {
+                    ret = 'page-hide';
+                }
+                return ret;
+            };
         },
     },
     created: function() {
-        this.pageManager.setAutoNextDuration(500);
-        this.pageManager.turnToPage(0);
+        this.pageTurningManager.turnToPage(0);
         this.initBadiduStatistics();
         this.initBackgroundMusic();
     },
@@ -82,13 +90,13 @@ export default {
     },
     methods: {
         handleLoadComplete() {
-            this.pageManager.turnToPage(1, 500);
+            this.pageTurningManager.turnToPage(1, 500);
         },
-        page1click() {
-            this.pageManager.turnToNextPageAutomatically();
+        nextPageClick() {
+            this.pageTurningManager.turnToNextPageAutomatically();
         },
         page4click() {
-            this.pageManager.turnToPage(1, 500);
+            this.pageTurningManager.turnToPage(1, 500);
         },
         startPlayBackgroundMusic(app) {
             window.createjs.Sound.registerSound(
@@ -117,19 +125,6 @@ export default {
 
             let appInstance = this;
 
-            // function startPlayBackgroundMusic() {
-            //   window.createjs.Sound.registerSound("/imgs/bgmusic.mp3", "sound"); // 注意,这句registerSound必须写在WeixinJSBridgeReady回调函数内才行,否则下方createjs.Sound.play就会无效
-            //   let intervalInstance = setInterval(function() {
-            //     if (appInstance.backgroundInfo.loadComplete) {
-            //       clearInterval(intervalInstance);
-            //       console.log("play");
-            //       appInstance.backgroundInfo.instance = window.createjs.Sound.play(
-            //         "sound"
-            //       );
-            //       window.store.setBackgroundMusicPlaying();
-            //     }
-            //   }, 10);
-            // }
             if (navi.isWX) {
                 document.addEventListener(
                     'WeixinJSBridgeReady',
@@ -210,9 +205,30 @@ body {
     background-image: url('../public/imgs/4.jpg');
 }
 
-.show-circle {
-    animation: clipCircleIn 0.5s linear forwards;
+.page-hint {
+    background-color: #ffffff;
+    color: #000000;
+    width: 75vw;
+    height: 10vw;
+    font-size: 15px;
+    line-height: 10vw;
+    text-align: center;
+}
+
+.page-show {
     z-index: 5;
+    opacity: 1;
+}
+
+.page-animate {
+    animation: clipCircleIn 0.5s linear forwards;
+    z-index: 10;
+    opacity: 1;
+}
+
+.page-hide {
+    z-index: 0;
+    opacity: 0;
 }
 
 @keyframes clipCircleIn {
