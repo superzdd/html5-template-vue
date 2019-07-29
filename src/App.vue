@@ -1,5 +1,5 @@
 <template>
-  <div id="app page">
+  <div id="app" class="page">
     <PageLoading v-if="pageLoadingShow" @loadComplete="handleLoadComplete"></PageLoading>
     <BasePage :class="pageClass(1)" @commonclick="nextPageClick">
       <div class="page1-bg">
@@ -171,7 +171,7 @@ body {
     -moz-osx-font-smoothing: grayscale;
     text-align: center;
     color: #2c3e50;
-    margin-top: 60px;
+    // margin-top: 60px;
 }
 
 .common-bg {
