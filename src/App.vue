@@ -1,26 +1,66 @@
 <template>
   <div id="app" class="page">
     <PageLoading v-if="pageLoadingShow" @loadComplete="handleLoadComplete"></PageLoading>
-    <BasePage :class="pageClass(1)" @commonclick="nextPageClick">
+    <BasePage :class="pageClass(1)">
       <div class="page1-bg">
-        <div class="page-hint">Page 1, click go to next page</div>
+        <div class="content page">
+          <div class="page-hint">Page 1, click go to next page</div>
+
+          <!-- div background-image 形式 -->
+          <!-- <div
+          class="rect"
+          v-hammer:pinch="pinch"
+          v-hammer:pinchstart="pinchstart"
+          v-hammer:pinchin="pinchin"
+          v-hammer:pinchout="pinchout"
+          v-hammer:pinchend="pinchend"
+          v-hammer:pinchcancel="pinchend"
+          v-hammer:pan="panmove"
+          v-hammer:panstart="panstart"
+          v-hammer:rotate="rotate"
+          v-hammer:rotatestart="rotatestart"
+          v-hammer:rotateend="rotateend"
+          v-hammer:rotatecancel="rotateend"
+          :style="{transform: rectComputed,'transform-origin': rectOrigin}"
+          ></div>-->
+
+          <img
+            class="rect"
+            v-hammer:pinch="pinch"
+            v-hammer:pinchstart="pinchstart"
+            v-hammer:pinchin="pinchin"
+            v-hammer:pinchout="pinchout"
+            v-hammer:pinchend="pinchend"
+            v-hammer:pinchcancel="pinchend"
+            v-hammer:pan="panmove"
+            v-hammer:panstart="panstart"
+            v-hammer:rotate="rotate"
+            v-hammer:rotatestart="rotatestart"
+            v-hammer:rotateend="rotateend"
+            v-hammer:rotatecancel="rotateend"
+            src="../public/imgs/tyx.jpg"
+            :style="{transform: rectComputed,'transform-origin': rectOrigin}"
+          />
+
+          <div class="page-hint" @click="autoRotate">auto rotate</div>
+
+          <div class="page-hint" @click="snap">snap</div>
+        </div>
+
+        <div class="back-content" ref="snapp" id="snapp">
+          <img
+            class="rect"
+            src="../public/imgs/tyx.jpg"
+            :style="{transform: rectSnapComputed,'transform-origin': rectOrigin}"
+          />
+        </div>
       </div>
     </BasePage>
-    <BasePage :class="pageClass(2)" @commonclick="nextPageClick">
-      <div class="page2-bg">
-        <div class="page-hint">Page 2, click go to next page</div>
-      </div>
+    <BasePage :class="pageClass(2)">
+      <div class="page-hint" @click="nextPageClick">长按保存图片</div>
+      <img class="snapImage page" :src="src" />
     </BasePage>
-    <BasePage :class="pageClass(3)" @commonclick="nextPageClick">
-      <div class="page3-bg">
-        <div class="page-hint">Page 3, click go to next page</div>
-      </div>
-    </BasePage>
-    <BasePage :class="pageClass(4)" @commonclick="page4click">
-      <div class="page4-bg">
-        <div class="page-hint">Page 4, click back to page1</div>
-      </div>
-    </BasePage>
+
     <MusicButton
       @backgroundMusicPause="backgroundMusicPauseHandler"
       @backgroundMusicPlay="backgroundMusicPlayHandler"
@@ -34,9 +74,12 @@ import navi from './util/nav-controller.js';
 import { getWindowSize } from './util/rem.js';
 import pageTurningManager from './util/page-turning-manager.js';
 
+import html2canvas from 'html2canvas';
+
 import BasePage from './components/BasePage.vue';
 import MusicButton from './components/MusicButton.vue';
 import PageLoading from './components/PageLoading.vue';
+import { setTimeout, setInterval, clearInterval } from 'timers';
 
 export default {
     name: 'app',
@@ -53,6 +96,24 @@ export default {
                 instance: null, // 背景音乐实例
             },
             pageTurningManager, // 页面跳转管理器
+            rectInfo: {
+                startScalee: 1,
+                scale: 1,
+                startX: 0,
+                startY: 0,
+                x: 0,
+                y: 0,
+                startAngle: 0,
+                angle: 0,
+                inPinch: false,
+                inRotate: false,
+                snapScale: 1, // 用于截图元素对比页面显示元素的放大比例，涉及到方块发生位移时，截图元素要对位移进行缩放
+            },
+            canvasInfo: {
+                width: 0,
+                height: 0,
+            },
+            src: '',
         };
     },
     computed: {
@@ -72,21 +133,68 @@ export default {
                 return ret;
             };
         },
+        rectComputed: function() {
+            return `scale(${this.rectInfo.scale})
+                translateX(${this.rectInfo.x}px)
+                translateY(${this.rectInfo.y}px)
+                rotate(${this.rectInfo.angle}deg)`;
+        },
+        rectSnapComputed: function() {
+            let rect = this.rectInfo;
+
+            return `scale(${rect.scale}) 
+                translateX(${rect.x * rect.snapScale}px) 
+                translateY(${rect.y * rect.snapScale}px) 
+                rotate(${rect.angle}deg)`;
+        },
+        rectOrigin: function() {
+            return '50% 50%';
+            // let rect = this.rectInfo;
+            // return `${50 + rect.x}px ${50 + rect.y}px`;
+        },
     },
     created: function() {
         this.pageTurningManager.turnToPage(0);
         this.initBadiduStatistics();
-        this.initBackgroundMusic();
+        // this.initBackgroundMusic();
     },
     mounted: function() {
         const { width, height } = getWindowSize();
 
+        // 截图
+        let whPercent = Math.round((height / width) * 100) / 100;
+        let snapImageWidth = 750;
+        this.rectInfo.snapScale =
+            Math.round((snapImageWidth / width) * 100) / 100;
+
         document.body.style.setProperty('--px-height', height + 'px');
+        document.body.style.setProperty('--wh-percent', whPercent);
+        document.body.style.setProperty(
+            '--px-height-snap',
+            snapImageWidth * whPercent + 'px'
+        );
+
+        document.body.style.setProperty(
+            '--px-width-snap',
+            snapImageWidth + 'px'
+        );
+
+        document.body.style.setProperty(
+            '--px-width-snap-rect',
+            (100 * snapImageWidth) / width + 'px'
+        );
+
+        // 转场动画
         document.body.style.setProperty(
             '--circle-radius',
             Math.ceil(Math.sqrt(height * height + width * width) * 100) / 100 +
                 'px'
         );
+
+        // canvas
+        const ratio = window.devicePixelRatio;
+        this.canvasInfo.width = width * ratio;
+        this.canvasInfo.height = height * ratio;
     },
     methods: {
         handleLoadComplete() {
@@ -153,6 +261,97 @@ export default {
             window.store.setBackgroundMusicPlaying();
             this.backgroundInfo.instance.paused = false;
         },
+        pinch(ev) {
+            // console.log('pinch');
+            // console.log(ev);
+            this.rectInfo.scale = ev.scale * this.rectInfo.startScale;
+        },
+        pinchin() {
+            // console.log('pinchin');
+            this.rectInfo.scale = Math.max(0.5, this.rectInfo.scale);
+        },
+        pinchout() {
+            // console.log('pinchout');
+            // this.rectInfo.scale = Math.min(2.5, this.rectInfo.scale);
+        },
+        pinchstart() {
+            this.rectInfo.inPinch = true;
+            this.rectInfo.startScale = this.rectInfo.scale;
+        },
+        pinchend() {
+            console.log('pinchend');
+            setTimeout(() => {
+                this.rectInfo.inPinch = false;
+            }, 200);
+        },
+        panmove(ev) {
+            if (this.rectInfo.inPinch) {
+                return;
+            }
+
+            console.log('pan');
+            let rect = this.rectInfo;
+            // console.log(ev);
+            rect.x = rect.startX + ev.deltaX / rect.scale;
+            rect.y = rect.startY + ev.deltaY / rect.scale;
+        },
+        panstart() {
+            if (this.rectInfo.inPinch) {
+                return;
+            }
+            console.log('panstart');
+            let rect = this.rectInfo;
+            rect.startX = rect.x;
+            rect.startY = rect.y;
+        },
+        rotate(ev) {
+            console.log('rotate');
+            console.log(ev);
+            let rect = this.rectInfo;
+            // rect.angle = rect.startAngle + ev.rotation;
+            rect.angle = ev.rotation - rect.startAngle;
+        },
+        rotatestart(ev) {
+            let rect = this.rectInfo;
+            rect.inRotate = true;
+            rect.startAngle = ev.rotation;
+        },
+        rotateend() {
+            setTimeout(() => {
+                this.rectInfo.inRotate = false;
+            }, 200);
+        },
+        autoRotate() {
+            if (this.rectInterval) {
+                window.clearInterval(this.rectInterval);
+                this.rectInterval = null;
+            } else {
+                this.rectInterval = window.setInterval(() => {
+                    this.rectInfo.angle += 1;
+                    if (this.rectInfo.angle > 360) {
+                        this.rectInfo.angle = 5;
+                    }
+                }, 1000 / 60);
+            }
+        },
+        snap() {
+            console.log(this.$refs.snapp);
+            html2canvas(document.getElementById('snapp'), { scale: 2 }).then(
+                canvas => {
+                    console.log(canvas);
+                    // var ctx = this.$refs.canvas.getContext('2d');
+                    // var img = new Image();
+                    // img.onload = () => {
+                    //     console.log('load complete');
+                    //     this.pageTurningManager.turnToPage(2, 500);
+                    //     ctx.drawImage(img, 0, 0);
+                    // };
+                    // img.src = canvas.toDataURL();
+                    this.src = canvas.toDataURL();
+                    this.pageTurningManager.turnToPage(2, 500);
+                }
+            );
+        },
     },
 };
 </script>
@@ -162,7 +361,10 @@ export default {
 body {
     --rem-height: 0rem;
     --px-height: 0px;
+    --px-width-snap: 0px;
+    --px-height-snap: 0px;
     --circle-radius: 0px;
+    --wh-percent: 1;
 }
 
 #app {
@@ -188,6 +390,19 @@ body {
 .page1-bg {
     @extend .common-bg;
     background-image: url('../public/imgs/1.jpg');
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+
+    .rect {
+        width: 100px;
+        height: 100px;
+        // background-color: red;
+        transform-origin: 50% 50%;
+        // background-image: url('../public/imgs/tyx.jpg');
+        // background-size: 100% 100%;
+    }
 }
 
 .page2-bg {
@@ -237,6 +452,52 @@ body {
     }
     100% {
         clip-path: circle(var(--circle-radius) at 0% 100%);
+    }
+}
+
+#canvas {
+    width: 100%;
+    height: 100%;
+}
+
+.content {
+    @extend .common-bg;
+    background-image: url('../public/imgs/1.jpg');
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    z-index: 5;
+    opacity: 1;
+    .rect {
+        position: absolute;
+        left: 50%;
+        height: 50%;
+        width: 100px;
+        height: 100px;
+        // background-color: red;
+        transform-origin: 50% 50%;
+        // background-image: url('../public/imgs/tyx.jpg');
+        // background-size: 100% 100%;
+    }
+}
+
+.back-content {
+    @extend .common-bg;
+    z-index: 0;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: var(--px-width-snap);
+    height: var(--px-height-snap);
+    background-image: url('../public/imgs/1.jpg');
+    .rect {
+        position: absolute;
+        left: 50%;
+        height: 50%;
+        width: var(--px-width-snap-rect);
+        height: var(--px-width-snap-rect);
+        transform-origin: 50% 50%;
     }
 }
 </style>

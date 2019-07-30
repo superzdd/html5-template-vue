@@ -7,6 +7,9 @@ import store from './util/store.js';
 // eslint-disable-next-line no-unused-vars
 const vConsole = require('./util/vconsole.js');
 
+import { VueHammer } from 'vue2-hammer';
+Vue.use(VueHammer);
+
 Vue.config.productionTip = false;
 
 new Vue({
