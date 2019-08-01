@@ -104,6 +104,7 @@ export default {
                 x: 0,
                 y: 0,
                 startAngle: 0,
+                lastRotation: 0,
                 angle: 0,
                 inPinch: false,
                 inRotate: false,
@@ -305,18 +306,26 @@ export default {
             rect.startY = rect.y;
         },
         rotate(ev) {
-            console.log('rotate');
-            console.log(ev);
+            // console.log('rotate');
+            console.log(`rotate, angle: ${ev.angle} rotation: ${ev.rotation}`);
             let rect = this.rectInfo;
             // rect.angle = rect.startAngle + ev.rotation;
-            rect.angle = ev.rotation - rect.startAngle;
+            rect.angle += ev.rotation - rect.lastRotation;
+            rect.lastRotation = ev.rotation;
         },
         rotatestart(ev) {
             let rect = this.rectInfo;
+            console.log(
+                `rotate start, angle: ${ev.angle} rotation: ${ev.rotation}`
+            );
             rect.inRotate = true;
-            rect.startAngle = ev.rotation;
+            rect.startAngle = rect.angle;
+            rect.lastRotation = ev.rotation;
         },
-        rotateend() {
+        rotateend(ev) {
+            console.log(
+                `rotate end, angle: ${ev.angle} rotation: ${ev.rotation}`
+            );
             setTimeout(() => {
                 this.rectInfo.inRotate = false;
             }, 200);
