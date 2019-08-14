@@ -33,10 +33,12 @@ import baiduStatistics from './util/baidu-statistics.js';
 import navi from './util/nav-controller.js';
 import { getWindowSize } from './util/rem.js';
 import pageTurningManager from './util/page-turning-manager.js';
+// import {wxShare} from './util/wechat-share.js'
 
 import BasePage from './components/BasePage.vue';
 import MusicButton from './components/MusicButton.vue';
 import PageLoading from './components/PageLoading.vue';
+
 
 export default {
     name: 'app',
@@ -87,6 +89,8 @@ export default {
             Math.ceil(Math.sqrt(height * height + width * width) * 100) / 100 +
                 'px'
         );
+
+        // wxShare();
     },
     methods: {
         handleLoadComplete() {
