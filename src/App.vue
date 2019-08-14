@@ -1,30 +1,9 @@
 <template>
   <div id="app" class="page">
-    <PageLoading v-if="pageLoadingShow" @loadComplete="handleLoadComplete"></PageLoading>
-    <BasePage :class="pageClass(1)" @commonclick="nextPageClick">
-      <div class="page1-bg">
-        <div class="page-hint">Page 1, click go to next page</div>
-      </div>
+    <BasePage>
+      <canvas id="cvs" width="640" height="1038"></canvas>
     </BasePage>
-    <BasePage :class="pageClass(2)" @commonclick="nextPageClick">
-      <div class="page2-bg">
-        <div class="page-hint">Page 2, click go to next page</div>
-      </div>
-    </BasePage>
-    <BasePage :class="pageClass(3)" @commonclick="nextPageClick">
-      <div class="page3-bg">
-        <div class="page-hint">Page 3, click go to next page</div>
-      </div>
-    </BasePage>
-    <BasePage :class="pageClass(4)" @commonclick="page4click">
-      <div class="page4-bg">
-        <div class="page-hint">Page 4, click back to page1</div>
-      </div>
-    </BasePage>
-    <MusicButton
-      @backgroundMusicPause="backgroundMusicPauseHandler"
-      @backgroundMusicPlay="backgroundMusicPlayHandler"
-    ></MusicButton>
+    <MusicButton></MusicButton>
   </div>
 </template>
 
@@ -33,16 +12,18 @@ import baiduStatistics from './util/baidu-statistics.js';
 import navi from './util/nav-controller.js';
 import { getWindowSize } from './util/rem.js';
 import pageTurningManager from './util/page-turning-manager.js';
-
+import { Stage, Text } from '@createjs/easeljs';
+import { Tween } from '@createjs/tweenjs';
+import { Ticker } from '@createjs/core';
 import BasePage from './components/BasePage.vue';
 import MusicButton from './components/MusicButton.vue';
-import PageLoading from './components/PageLoading.vue';
+// import PageLoading from './components/PageLoading.vue';
 
 export default {
     name: 'app',
     components: {
         BasePage,
-        PageLoading,
+        // PageLoading,
         MusicButton,
     },
     data: function() {
@@ -53,6 +34,14 @@ export default {
                 instance: null, // 背景音乐实例
             },
             pageTurningManager, // 页面跳转管理器
+            canvasInfo: {
+                stage: null, // createjs的canvas实例对象
+                width: 0, // 画布的宽度，指的是画布的逻辑宽度，即屏幕宽度像素数量 * ratio（每像素包含的实际像素）
+                height: 0, // 画布的高度，指的是画布的逻辑高度，即屏幕高度像素数量 * ratio（每像素包含的实际像素）
+                centerX: 0, // 画布中心点x
+                centerY: 0, // 画布中心点y
+                distanceToCenter: 0, // 左上角到中心点的距离
+            },
         };
     },
     computed: {
@@ -74,9 +63,9 @@ export default {
         },
     },
     created: function() {
-        this.pageTurningManager.turnToPage(0);
-        this.initBadiduStatistics();
-        this.initBackgroundMusic();
+        // this.pageTurningManager.turnToPage(0);
+        // this.initBadiduStatistics();
+        // this.initBackgroundMusic();
     },
     mounted: function() {
         const { width, height } = getWindowSize();
@@ -87,8 +76,48 @@ export default {
             Math.ceil(Math.sqrt(height * height + width * width) * 100) / 100 +
                 'px'
         );
+
+        let ratio = window.devicePixelRatio;
+
+        let windowSizeInfo = getWindowSize();
+
+        // 画布基本信息
+        let canvasInfo = this.canvasInfo;
+
+        // canvasInfo.stage = new createjs.Stage('cvs');
+        // createjs.Touch.enable(canvasInfo.stage); // 定义手机上可以使用手指触发mousemove等鼠标事件
+        canvasInfo.width = windowSizeInfo.width * ratio;
+        canvasInfo.height = windowSizeInfo.height * ratio;
+        canvasInfo.centerX = canvasInfo.width / 2;
+        canvasInfo.centerY = canvasInfo.height / 2;
+        canvasInfo.distanceToCenter = Math.sqrt(
+            canvasInfo.centerX * canvasInfo.centerX +
+                canvasInfo.centerY * canvasInfo.centerY
+        );
+
+        this.render();
     },
     methods: {
+        render: function() {
+            let stage = new Stage('cvs');
+            let text = new Text('Herdsric', '20px Arial', '#ff7700');
+            text.x = 100;
+            text.y = 100;
+            text.textBaseline = 'alphabetic';
+
+            stage.addChild(text);
+
+            stage.update();
+
+            Tween.get(text, { loop: true }).to({ x: 300 }, 400);
+
+            // window.setInterval(() => {
+            //     stage.update();
+            // }, 30);
+
+            Ticker.framerate = 120;
+            Ticker.addEventListener('tick', stage);
+        },
         handleLoadComplete() {
             this.pageTurningManager.turnToPage(1, 500);
         },
@@ -172,6 +201,11 @@ body {
     text-align: center;
     color: #2c3e50;
     // margin-top: 60px;
+}
+
+#cvs {
+    width: 100vw;
+    height: 100vh;
 }
 
 .common-bg {
