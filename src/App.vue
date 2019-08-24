@@ -1,31 +1,53 @@
 <template>
-  <div id="app" class="page">
-    <PageLoading v-if="pageLoadingShow" @loadComplete="handleLoadComplete"></PageLoading>
-    <BasePage :class="pageClass(1)" @commonclick="nextPageClick">
-      <div class="page1-bg">
-        <div class="page-hint">Page 1, click go to next page</div>
-      </div>
-    </BasePage>
-    <BasePage :class="pageClass(2)" @commonclick="nextPageClick">
-      <div class="page2-bg">
-        <div class="page-hint">Page 2, click go to next page</div>
-      </div>
-    </BasePage>
-    <BasePage :class="pageClass(3)" @commonclick="nextPageClick">
-      <div class="page3-bg">
-        <div class="page-hint">Page 3, click go to next page</div>
-      </div>
-    </BasePage>
-    <BasePage :class="pageClass(4)" @commonclick="page4click">
-      <div class="page4-bg">
-        <div class="page-hint">Page 4, click back to page1</div>
-      </div>
-    </BasePage>
-    <MusicButton
-      @backgroundMusicPause="backgroundMusicPauseHandler"
-      @backgroundMusicPlay="backgroundMusicPlayHandler"
-    ></MusicButton>
-  </div>
+    <div id="app" class="page">
+        <PageLoading v-if="pageLoadingShow" @loadComplete="handleLoadComplete"></PageLoading>
+        <BasePage :class="pageClass(1)" @commonclick="nextPageClick">
+            <div class="page1-bg">
+                <div class="page-hint">Page 1, click go to next page</div>
+            </div>
+        </BasePage>
+        <BasePage :class="pageClass(2)">
+            <div class="page2-bg">
+                <MovieClip
+                    class="movie-clip-demo"
+                    :imageArray="movieClipInfo.imageArray"
+                    :fps="movieClipInfo.fps"
+                    :startPlay="movieClipInfo.startPlay"
+                    :loop="movieClipInfo.loop"
+                    :reversePlay="movieClipInfo.reversePlay"
+                    :pause="movieClipInfo.pause"
+                    @frameEnd="playToEnd"
+                ></MovieClip>
+                <div
+                    class="page-hint"
+                    @click="movieClipPlayClickHandler"
+                >{{movieClipInfo.startPlay?'点击暂停序列帧':'点击开始序列帧'}}</div>
+                <div
+                    class="page-hint"
+                    @click="movieClipLoopClickHandler"
+                >{{movieClipInfo.loop?'点击序列帧单次播放':'点击序列帧循环播放'}}</div>
+                <div
+                    class="page-hint"
+                    @click="movieClipReverseClickHandler"
+                >{{movieClipInfo.reversePlay?'切换到正序播放':'切换到倒序播放'}}</div>
+                <div class="page-hint" @click="nextPageClick">Page 2, click go to next page</div>
+            </div>
+        </BasePage>
+        <BasePage :class="pageClass(3)" @commonclick="nextPageClick">
+            <div class="page3-bg">
+                <div class="page-hint">Page 3, click go to next page</div>
+            </div>
+        </BasePage>
+        <BasePage :class="pageClass(4)" @commonclick="page4click">
+            <div class="page4-bg">
+                <div class="page-hint">Page 4, click back to page1</div>
+            </div>
+        </BasePage>
+        <MusicButton
+            @backgroundMusicPause="backgroundMusicPauseHandler"
+            @backgroundMusicPlay="backgroundMusicPlayHandler"
+        ></MusicButton>
+    </div>
 </template>
 
 <script>
@@ -38,7 +60,7 @@ import pageTurningManager from './util/page-turning-manager.js';
 import BasePage from './components/BasePage.vue';
 import MusicButton from './components/MusicButton.vue';
 import PageLoading from './components/PageLoading.vue';
-
+import MovieClip from './components/MovieClip.vue';
 
 export default {
     name: 'app',
@@ -46,6 +68,7 @@ export default {
         BasePage,
         PageLoading,
         MusicButton,
+        MovieClip,
     },
     data: function() {
         return {
@@ -55,6 +78,15 @@ export default {
                 instance: null, // 背景音乐实例
             },
             pageTurningManager, // 页面跳转管理器
+            publicPath: process.env.BASE_URL,
+            movieClipInfo: {
+                imageArray: [],
+                fps: 30,
+                startPlay: false,
+                loop: false,
+                reversePlay: false,
+                pause: false,
+            },
         };
     },
     computed: {
@@ -79,6 +111,7 @@ export default {
         this.pageTurningManager.turnToPage(0);
         this.initBadiduStatistics();
         this.initBackgroundMusic();
+        this.initMovieClipImageArray();
     },
     mounted: function() {
         const { width, height } = getWindowSize();
@@ -157,6 +190,37 @@ export default {
             window.store.setBackgroundMusicPlaying();
             this.backgroundInfo.instance.paused = false;
         },
+        /**
+         * 初始化序列帧数组
+         */
+        initMovieClipImageArray() {
+            let ret = [];
+            let imageBaseUrl = this.publicPath + 'imgs/movieclip/mc_';
+            for (let i = 1; i <= 10; i++) {
+                ret.push(`${imageBaseUrl}${i}.jpg`);
+            }
+
+            this.movieClipInfo.imageArray = ret;
+        },
+        movieClipPlayClickHandler() {
+            if (this.movieClipInfo.startPlay) {
+                this.movieClipInfo.pause = !this.movieClipInfo.pause;
+            } else {
+                this.movieClipInfo.startPlay = true;
+            }
+        },
+        movieClipLoopClickHandler() {
+            this.movieClipInfo.loop = !this.movieClipInfo.loop;
+        },
+        movieClipReverseClickHandler() {
+            this.movieClipInfo.reversePlay = !this.movieClipInfo.reversePlay;
+        },
+        playToEnd() {
+            if (!this.movieClipInfo.loop) {
+                this.movieClipInfo.startPlay = false;
+                this.movieClipInfo.pause = false;
+            }
+        },
     },
 };
 </script>
@@ -196,6 +260,7 @@ body {
 
 .page2-bg {
     @extend .common-bg;
+    flex-direction: column;
     background-image: url('../public/imgs/2.jpg');
 }
 
@@ -217,6 +282,7 @@ body {
     font-size: 15px;
     line-height: 10vw;
     text-align: center;
+    margin: 2vw;
 }
 
 .page-show {
@@ -242,5 +308,10 @@ body {
     100% {
         clip-path: circle(var(--circle-radius) at 0% 100%);
     }
+}
+
+.movie-clip-demo {
+    width: 40vw;
+    height: 25vw;
 }
 </style>
