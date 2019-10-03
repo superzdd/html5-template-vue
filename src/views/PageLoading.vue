@@ -8,8 +8,8 @@
 </template>
 
 <script>
-import BasePage from './BasePage.vue';
-import imageLoad from '../util/image-load.js';
+import BasePage from '@/components/BasePage.vue';
+import imageLoad from '@/util/image-load.js';
 export default {
     name: 'pageLoading',
     components: {
@@ -51,7 +51,11 @@ export default {
                         this.loadPercent = Math.floor(num);
                     },
                     () => {
-                        this.$emit('loadComplete');
+                        // this.$emit('loadComplete');
+                        this.$router.push({
+                            name: 'manager',
+                            params: { pageEvent: 'loadComplete' },
+                        });
                     }
                 );
         },
