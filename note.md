@@ -64,15 +64,32 @@ npm audit fix
 
 1. vue.config.js
 
-- 这个文件需要自己新增，文件和`package.json`同级
-- 暂时没有放太多配置项在里面，可以随时添加，[文档在这里](https://cli.vuejs.org/zh/config/#全局-cli-配置)
+-   这个文件需要自己新增，文件和`package.json`同级
+-   暂时没有放太多配置项在里面，可以随时添加，[文档在这里](https://cli.vuejs.org/zh/config/#全局-cli-配置)
 
 2. 页面运行后无法加载 js 文件，观察 chrome 的 source 中的 js 文件，发现都是`<!Doctype html>`文件，根本没有展示真正内容
 
-- publicPath 出的问题，因为这个项目现在是两层： `HTML%-TEMPLATE-VUE-V0.1 -> template-vue`，所以路径要是`./`，在`vue.config.js`中写入一下内容
+-   publicPath 出的问题，因为这个项目现在是两层： `HTML%-TEMPLATE-VUE-V0.1 -> template-vue`，所以路径要是`./`，在`vue.config.js`中写入一下内容
 
 ```js
 module.exports = {
-  publicPath: "./"
+    publicPath: './',
 };
 ```
+
+## 相对路径说明
+
+a.vue 文件中写相对路径都是相对 a.vue 路径路径
+
+"./1.jpg"           a.vue 相同目录下的 1.jpg 文件
+
+"../1.jpg"          a.vue 上级目录下 1.jpg 文件
+
+"../../1.jpg"       a.vue 上两级目录下 1.jpg 文件
+
+"../../../1.jpg"      a.vue 上三级目录下 1.jpg 文件
+
+作者：阿珂刺秦王 2018
+链接：https://www.jianshu.com/p/f868acce6c62
+来源：简书
+著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。

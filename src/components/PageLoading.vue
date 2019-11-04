@@ -61,7 +61,6 @@ export default {
 
 <style lang="scss">
 @import url('../style/common.scss');
-
 .bg {
     display: flex;
     justify-content: center;

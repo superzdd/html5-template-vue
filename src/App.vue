@@ -1,12 +1,12 @@
 <template>
     <div id="app" class="page">
         <PageLoading v-if="pageLoadingShow" @loadComplete="handleLoadComplete"></PageLoading>
-        <BasePage :class="pageClass(1)" @commonclick="nextPageClick">
+        <BasePage v-if="isCurrentPage(1)" :class="pageClass(1)" @commonclick="nextPageClick">
             <div class="page1-bg">
                 <div class="page-hint">Page 1, click go to next page</div>
             </div>
         </BasePage>
-        <BasePage :class="pageClass(2)">
+        <BasePage v-if="isCurrentPage(2)" :class="pageClass(2)">
             <div class="page2-bg">
                 <MovieClip
                     class="movie-clip-demo"
@@ -33,12 +33,13 @@
                 <div class="page-hint" @click="nextPageClick">Page 2, click go to next page</div>
             </div>
         </BasePage>
-        <BasePage :class="pageClass(3)" @commonclick="nextPageClick">
+        <!-- <BasePage :class="pageClass(3)" @commonclick="nextPageClick">
             <div class="page3-bg">
                 <div class="page-hint">Page 3, click go to next page</div>
             </div>
-        </BasePage>
-        <BasePage :class="pageClass(4)" @commonclick="page4click">
+        </BasePage>-->
+        <UploadPage v-if="isCurrentPage(3)"></UploadPage>
+        <BasePage v-if="isCurrentPage(4)" :class="pageClass(4)" @commonclick="page4click">
             <div class="page4-bg">
                 <div class="page-hint">Page 4, click back to page1</div>
             </div>
@@ -61,6 +62,7 @@ import BasePage from './components/BasePage.vue';
 import MusicButton from './components/MusicButton.vue';
 import PageLoading from './components/PageLoading.vue';
 import MovieClip from './components/MovieClip.vue';
+import UploadPage from './components/UploadPage.vue';
 
 export default {
     name: 'app',
@@ -69,6 +71,7 @@ export default {
         PageLoading,
         MusicButton,
         MovieClip,
+        UploadPage,
     },
     data: function() {
         return {
@@ -77,6 +80,7 @@ export default {
                 loadComplete: false, // 背景音乐素材是否加载完毕
                 instance: null, // 背景音乐实例
             },
+            backgroundMusicAutoPlay: false,
             pageTurningManager, // 页面跳转管理器
             publicPath: process.env.BASE_URL,
             movieClipInfo: {
@@ -110,7 +114,9 @@ export default {
     created: function() {
         this.pageTurningManager.turnToPage(0);
         this.initBadiduStatistics();
-        this.initBackgroundMusic();
+        if (this.backgroundMusicAutoPlay) {
+            this.initBackgroundMusic();
+        }
         this.initMovieClipImageArray();
     },
     mounted: function() {
@@ -131,6 +137,9 @@ export default {
         },
         nextPageClick() {
             this.pageTurningManager.turnToNextPageAutomatically();
+        },
+        isCurrentPage(i) {
+            return this.pageTurningManager.isCurrentPage(i);
         },
         page4click() {
             this.pageTurningManager.turnToPage(1, 500);
