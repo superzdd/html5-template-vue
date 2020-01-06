@@ -57,8 +57,12 @@
             @backgroundMusicPause="backgroundMusicPauseHandler"
             @backgroundMusicPlay="backgroundMusicPlayHandler"
         ></MusicButton>
-
-        <div v-if="showBgMusicHint" class="hint-bg-music-box">
+        <BgMusicHint
+            :showBgMusicHint="showBgMusicHint"
+            @confirm="bgMusicConfirmHandler"
+            @cancel="bgMusicCancelHandler"
+        ></BgMusicHint>
+        <!-- <div v-if="showBgMusicHint" class="hint-bg-music-box">
             <div class="all-black"></div>
 
             <div class="dialog-container">
@@ -69,7 +73,7 @@
                     <div class="cancel" @click="bgMusicCancelHandler">否</div>
                 </div>
             </div>
-        </div>
+        </div>-->
     </div>
 </template>
 
@@ -86,6 +90,7 @@ import MusicButton from './components/MusicButton.vue';
 import PageLoading from './components/PageLoading.vue';
 import MovieClip from './components/MovieClip.vue';
 import UploadPage from './components/UploadPage.vue';
+import BgMusicHint from './components/BgMusicHint.vue';
 export default {
     name: 'app',
     components: {
@@ -94,16 +99,15 @@ export default {
         MusicButton,
         MovieClip,
         UploadPage,
+        BgMusicHint,
     },
     data: function() {
         return {
             sharedState: window.store.state,
-            backgroundInfo: {
-                loadComplete: false, // 背景音乐素材是否加载完毕
-                instance: null, // 背景音乐实例
-            },
-            bgMusic: null,
             backgroundMusicAutoPlay: true,
+            bgMusic: null,
+            userBgMusicConfirmed: false, // 背景音乐是否已经确认完毕？1：微信浏览器中，自动确认；2：其他浏览器中，由用户点击确认
+            assetsLoaded: false, // h5素材有没有加载完毕
             pageTurningManager, // 页面跳转管理器
             publicPath: process.env.BASE_URL,
             movieClipInfo: {
@@ -157,7 +161,14 @@ export default {
     },
     methods: {
         handleLoadComplete() {
-            this.pageTurningManager.turnToPage(1, 500);
+            this.assetsLoaded = true;
+            // 素材加载完毕后，要同时确认用户有没有确认背景音乐的情况，同时确认才能前往下一页
+            this.checkAndGoFirstPage();
+        },
+        checkAndGoFirstPage() {
+            if (this.userBgMusicConfirmed && this.assetsLoaded) {
+                this.pageTurningManager.turnToPage(1, 500);
+            }
         },
         nextPageClick() {
             this.pageTurningManager.turnToNextPageAutomatically();
@@ -169,30 +180,6 @@ export default {
             this.pageTurningManager.turnToPage(1, 500);
         },
         startPlayBackgroundMusic() {
-            // window.createjs.Sound.registerSound(
-            //     process.env.BASE_URL + 'imgs/bgmusic.mp3',
-            //     'sound'
-            // ); // 注意,这句registerSound必须写在WeixinJSBridgeReady回调函数内才行,否则下方window.createjs.Sound.play就会无效
-
-            // if (!force) {
-            //     let intervalInstance = setInterval(function() {
-            //         if (app.backgroundInfo.loadComplete) {
-            //             clearInterval(intervalInstance);
-            //             console.log('play');
-            //             app.backgroundInfo.instance = window.createjs.Sound.play(
-            //                 'sound'
-            //             );
-            //             window.store.setBackgroundMusicPlaying();
-            //         }
-            //     }, 10);
-            // } else {
-            //     console.log('startPlayBackgroundMusic: force play!');
-            //     app.backgroundInfo.instance = window.createjs.Sound.play(
-            //         'sound'
-            //     );
-            //     window.store.setBackgroundMusicPlaying();
-            // }
-
             this.bgMusic.play();
         },
         initBackgroundMusic() {
@@ -211,59 +198,10 @@ export default {
                     },
                     false
                 );
+                this.userBgMusicConfirmed = true; // 微信环境下，默认用户允许音乐自动播放
             } else {
                 this.showBgMusicHint = true;
-                // this.bgMusic.load();
             }
-
-            // if (!navi.isWX) {
-            //     window.createjs.Sound.registerSound(
-            //         process.env.BASE_URL + 'imgs/bgmusic.mp3',
-            //         'sound'
-            //     ); // 注意,这句registerSound必须写在WeixinJSBridgeReady回调函数内才行,否则下方window.createjs.Sound.play就会无效
-            // } else {
-            // }
-
-            // window.createjs.Sound.on('fileload', loadHandler, this);
-            // let appInstance = this;
-            // function loadHandler(event) {
-            //     console.log(`music load complete: ${JSON.stringify(event)}`);
-            //     appInstance.backgroundInfo.loadComplete = true;
-
-            //     if (!navi.isWX) {
-            //         appInstance.showBgMusicHint = true;
-            //     } else {
-            //         document.addEventListener(
-            //             'WeixinJSBridgeReady',
-            //             () => {
-            //                 console.log('WeixinJSBridgeReady');
-            //                 appInstance.startPlayBackgroundMusic(appInstance);
-            //             },
-            //             false
-            //         );
-            //     }
-            // }
-
-            // if (navi.isWX) {
-            //     document.addEventListener(
-            //         'WeixinJSBridgeReady',
-            //         () => {
-            //             console.log('WeixinJSBridgeReady');
-            //             // startPlayBackgroundMusic();
-            //             this.startPlayBackgroundMusic(appInstance);
-            //         },
-            //         false
-            //     );
-            // } else {
-            //     // if (confirm('是否播放背景音乐？')) {
-            //     //     let bgMusic = document.getElementById('bg-music');
-            //     //     bgMusic.play();
-            //     //     console.log('user allow to play music');
-            //     //     // 强制播放
-            //     //     // this.startPlayBackgroundMusic(appInstance, true);
-            //     // }
-            //     // this.showBgMusicHint = true;
-            // }
         },
         initBadiduStatistics() {
             baiduStatistics.init('abcdefg');
@@ -272,11 +210,11 @@ export default {
         },
         backgroundMusicPauseHandler() {
             window.store.setBackgroundMusicPause();
-            this.backgroundInfo.instance.paused = true;
+            this.bgMusic.pause();
         },
         backgroundMusicPlayHandler() {
             window.store.setBackgroundMusicPlaying();
-            this.backgroundInfo.instance.paused = false;
+            this.bgMusic.resume();
         },
         /**
          * 初始化序列帧数组
@@ -310,17 +248,15 @@ export default {
             }
         },
         bgMusicConfirmHandler() {
-            // this.bgMusicCancelHandler();
-            // // let bgMusic = document.getElementById('bg-music');
-            // // bgMusic.play();
-            // this.startPlayBackgroundMusic(this, true);
-
             this.bgMusicCancelHandler();
             this.bgMusic.load();
-            // this.startPlayBackgroundMusic(this, true);
+            window.store.setBackgroundMusicPlaying();
         },
         bgMusicCancelHandler() {
             this.showBgMusicHint = false;
+            // 设置用户已经确认了音乐的播放状态
+            this.userBgMusicConfirmed = true;
+            this.checkAndGoFirstPage();
         },
     },
 };
@@ -339,7 +275,6 @@ body {
     -moz-osx-font-smoothing: grayscale;
     text-align: center;
     color: #2c3e50;
-    // margin-top: 60px;
 }
 
 .common-bg {
@@ -413,78 +348,5 @@ body {
 .movie-clip-demo {
     width: 40vw;
     height: 25vw;
-}
-
-.hint-bg-music-box {
-    position: fixed;
-    width: 50vw;
-    height: 40vw;
-    left: 25vw;
-    top: calc(0.3 * var(--px-total-height));
-    z-index: 99;
-
-    .all-black {
-        background-color: #000000;
-        opacity: 0.5;
-        width: 100vw;
-        height: 100vh;
-        position: absolute;
-        left: -25vw;
-        top: calc(-0.3 * var(--px-total-height));
-        z-index: 0;
-    }
-
-    .dialog-container {
-        position: relative;
-        width: 100%;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-start;
-        align-items: center;
-        font-size: 0.3rem;
-        background-color: #ffffff;
-        border-radius: 10px;
-        z-index: 5;
-        box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.5);
-
-        p {
-            height: 70%;
-            line-height: 70%;
-            width: 100%;
-            font-weight: bold;
-            text-align: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .border-split {
-            width: 90%;
-            height: 0;
-            border-bottom: solid 1px #cccccc;
-            transform: translateY(1px);
-        }
-
-        .button-container {
-            width: 100%;
-            height: 30%;
-            display: flex;
-
-            div {
-                width: 50%;
-                height: 100%;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-            }
-
-            .cancel {
-                background-color: #cccccc;
-                color: #ffffff;
-                border-bottom-right-radius: 10px;
-            }
-        }
-    }
 }
 </style>
