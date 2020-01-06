@@ -12,11 +12,11 @@ class BaiduStatistics {
         }
 
         window._hmt = window._hmt || [];
-        (function () {
-            var hm = document.createElement("script");
+        (function() {
+            var hm = document.createElement('script');
             // hm.src = "//hm.baidu.com/hm.js?3729a1a76cb88da875455309d395b710";
-            hm.src = "//hm.baidu.com/hm.js?" + id;
-            var s = document.getElementsByTagName("script")[0];
+            hm.src = '//hm.baidu.com/hm.js?' + id;
+            var s = document.getElementsByTagName('script')[0];
             s.parentNode.insertBefore(hm, s);
         })();
     }
@@ -28,12 +28,20 @@ class BaiduStatistics {
 
     push(category, action = '', opt_label = '', opt_value = '') {
         if (!this.id) {
-            this.log('can not push event without id, please do function init and do this again');
+            this.log(
+                'can not push event without id, please do function init and do this again'
+            );
             return;
         }
         // 模仿百度统计的事件记录
         // http://tongji.baidu.com/open/api/more?p=guide_trackEvent
-        window._hmt.push(['_trackEvent', category, action, opt_label, opt_value]);
+        window._hmt.push([
+            '_trackEvent',
+            category,
+            action,
+            opt_label,
+            opt_value,
+        ]);
     }
 
     log(txt) {

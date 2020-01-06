@@ -16,6 +16,7 @@
         <div class="image-container">
             <img :src="uploadSrc" alt />
         </div>
+        <div class="page-hint">Page Upload, click go to next page</div>
     </BasePage>
 </template>
 
@@ -122,5 +123,17 @@ export default {
     img {
         width: 100%;
     }
+}
+
+.page-hint {
+    position: relative;
+    background-color: #ffffff;
+    color: #000000;
+    width: 75vw;
+    height: 10vw;
+    font-size: 15px;
+    line-height: 10vw;
+    text-align: center;
+    margin: 2vw;
 }
 </style>

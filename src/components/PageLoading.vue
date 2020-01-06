@@ -1,9 +1,8 @@
 <template>
     <BasePage>
-        <div
-            class="bg abs page"
-            :style="{backgroundImage: finalImageSrcBg}"
-        >Loading {{loadPercent}}%</div>
+        <div class="bg abs page" :style="{ backgroundImage: finalImageSrcBg }">
+            Loading {{ loadPercent }}%
+        </div>
     </BasePage>
 </template>
 
@@ -59,12 +58,12 @@ export default {
 };
 </script>
 
-<style lang="scss">
-@import url('../style/common.scss');
+<style lang="scss" scoped>
 .bg {
     display: flex;
     justify-content: center;
     align-items: center;
     background-size: 100% 100%;
+    font-size: 0.5rem;
 }
 </style>
