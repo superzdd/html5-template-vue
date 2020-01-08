@@ -47,12 +47,13 @@
                 <div class="page-hint">Page 3, click go to next page</div>
             </div>
         </BasePage>-->
-        <UploadPage :class="pageClass(3)"></UploadPage>
-        <BasePage :class="pageClass(4)" @commonclick="page4click">
+        <UploadPage :class="pageClass(3)" @nextPage="uploadPageNextPageHandler"></UploadPage>
+        <ShakePage :class="pageClass(4)"></ShakePage>
+        <!-- <BasePage :class="pageClass(4)" @commonclick="page4click">
             <div class="page4-bg">
                 <div class="page-hint">Page 4, click back to page1</div>
             </div>
-        </BasePage>
+        </BasePage>-->
         <MusicButton
             @backgroundMusicPause="backgroundMusicPauseHandler"
             @backgroundMusicPlay="backgroundMusicPlayHandler"
@@ -62,18 +63,6 @@
             @confirm="bgMusicConfirmHandler"
             @cancel="bgMusicCancelHandler"
         ></BgMusicHint>
-        <!-- <div v-if="showBgMusicHint" class="hint-bg-music-box">
-            <div class="all-black"></div>
-
-            <div class="dialog-container">
-                <p>是否播放背景音乐</p>
-                <div class="border-split"></div>
-                <div class="button-container">
-                    <div class="confirm" @click="bgMusicConfirmHandler">是</div>
-                    <div class="cancel" @click="bgMusicCancelHandler">否</div>
-                </div>
-            </div>
-        </div>-->
     </div>
 </template>
 
@@ -91,6 +80,7 @@ import PageLoading from './components/PageLoading.vue';
 import MovieClip from './components/MovieClip.vue';
 import UploadPage from './components/UploadPage.vue';
 import BgMusicHint from './components/BgMusicHint.vue';
+import ShakePage from './components/ShakePage.vue';
 export default {
     name: 'app',
     components: {
@@ -100,6 +90,7 @@ export default {
         MovieClip,
         UploadPage,
         BgMusicHint,
+        ShakePage,
     },
     data: function() {
         return {
@@ -195,6 +186,7 @@ export default {
                     () => {
                         console.log('WeixinJSBridgeReady');
                         this.bgMusic.load();
+                        window.store.setBackgroundMusicPlaying();
                     },
                     false
                 );
@@ -257,6 +249,9 @@ export default {
             // 设置用户已经确认了音乐的播放状态
             this.userBgMusicConfirmed = true;
             this.checkAndGoFirstPage();
+        },
+        uploadPageNextPageHandler() {
+            this.nextPageClick();
         },
     },
 };

@@ -15,9 +15,10 @@ let navController = {
     isMobile: false,
     isIpad: false,
     isPC: false,
-    init: function () {
+    init: function() {
         let u = navigator.userAgent;
-        let v = { //移动终端浏览器版本信息
+        let v = {
+            //移动终端浏览器版本信息
             trident: u.indexOf('Trident') > -1, //IE内核
             presto: u.indexOf('Presto') > -1, //opera内核
             webKit: u.indexOf('AppleWebKit') > -1, //苹果、谷歌内核
@@ -42,37 +43,45 @@ let navController = {
         this.isQQBrowser = v.qqBrowser;
         this.isMobile = v.mobile;
         this.isIpad = v.iPad;
-        this.isIos = true;
-        this.isAndroid = true;
-        this.isWebApp = true;
-
+        this.isIos = v.ios;
+        this.isAndroid = v.android;
+        this.isWebApp = v.webApp;
 
         if (v.mobile) {
             // 移动端设备细化判断是从什么浏览器打开
             let ua = u.toLowerCase(); //获取判断用的对象
 
-            if (ua.match(/MicroMessenger/i) == "micromessenger") {
+            if (ua.match(/MicroMessenger/i) == 'micromessenger') {
                 //在微信中打开
                 this.isWX = true;
             }
-            if (ua.match(/WeiBo/i) == "weibo") {
+            if (ua.match(/WeiBo/i) == 'weibo') {
                 //在新浪微博客户端打开
                 this.isWB = true;
             }
-            if (ua.match(/QQ/i) == "qq") {
+            if (ua.match(/QQ/i) == 'qq') {
                 //在QQ空间打开
                 this.isQQSpace = true;
             }
-            if (ua.match(/koubeidefined/i) == "koubeidefined") {
+            if (ua.match(/koubeidefined/i) == 'koubeidefined') {
                 //在口碑打开
                 this.isKB = true;
             }
-            if (ua.match(/dingtalk/i) == "dingtalk") {
+            if (ua.match(/dingtalk/i) == 'dingtalk') {
                 //在口碑打开
                 this.isDD = true;
             }
         }
-    }
+    },
+    output: function() {
+        console.log(`navi controller: ${navigator.userAgent}`);
+        console.log(
+            `navi controller: ${JSON.stringify({
+                wx: this.isWX,
+                ios: this.isIos,
+            })}`
+        );
+    },
 };
 
 navController.init();

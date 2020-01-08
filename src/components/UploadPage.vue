@@ -16,7 +16,7 @@
         <div class="image-container">
             <img :src="uploadSrc" alt />
         </div>
-        <div class="page-hint">Page Upload, click go to next page</div>
+        <div class="page-hint" @click="nextPageHandler">Page Upload, click go to next page</div>
     </BasePage>
 </template>
 
@@ -76,6 +76,9 @@ export default {
                     };
                 }
             }
+        },
+        nextPageHandler: function() {
+            this.$emit('nextPage');
         },
     },
 };
