@@ -48,12 +48,7 @@
             </div>
         </BasePage>-->
         <UploadPage :class="pageClass(3)" @nextPage="uploadPageNextPageHandler"></UploadPage>
-        <ShakePage :class="pageClass(4)"></ShakePage>
-        <!-- <BasePage :class="pageClass(4)" @commonclick="page4click">
-            <div class="page4-bg">
-                <div class="page-hint">Page 4, click back to page1</div>
-            </div>
-        </BasePage>-->
+        <ShakePage :class="pageClass(4)" @nextPage="shakePageNextPageHandler"></ShakePage>
         <MusicButton
             @backgroundMusicPause="backgroundMusicPauseHandler"
             @backgroundMusicPlay="backgroundMusicPlayHandler"
@@ -167,9 +162,6 @@ export default {
         isCurrentPage(i) {
             return this.pageTurningManager.isCurrentPage(i);
         },
-        page4click() {
-            this.pageTurningManager.turnToPage(1, 500);
-        },
         startPlayBackgroundMusic() {
             this.bgMusic.play();
         },
@@ -252,6 +244,9 @@ export default {
         },
         uploadPageNextPageHandler() {
             this.nextPageClick();
+        },
+        shakePageNextPageHandler() {
+            this.pageTurningManager.turnToPage(1, 500);
         },
     },
 };

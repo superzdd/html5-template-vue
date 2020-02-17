@@ -15,7 +15,7 @@
                 >IOS Safari专用shake按钮</div>
                 <img src="../../public/imgs/logo.png" :class="{shaking:deviceIsShaking}" alt="logo" />
             </div>
-            <div class="page-hint">Page Shake, click go to next page</div>
+            <div class="page-hint" @click="pageHintClickHandler">Page Shake, click go to next page</div>
         </div>
     </BasePage>
 </template>
@@ -155,6 +155,9 @@ export default {
             this.resetShakingTimeoutHandler = setTimeout(() => {
                 this.deviceIsShaking = false;
             }, 1000);
+        },
+        pageHintClickHandler() {
+            this.$emit('nextPage');
         },
     },
 };
