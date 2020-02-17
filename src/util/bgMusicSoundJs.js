@@ -44,7 +44,7 @@ class BGMusicSoundJs {
                 `BGMusic: background music has not been loaded yet, play quit!`
             );
         }
-        this.bgInstance = this.sound.play(this.id); // 发挥使用ID。也可以使用完整的源路径或event.src。
+        this.bgInstance = this.sound.play(this.id, { loop: -1 }); // 发挥使用ID。也可以使用完整的源路径或event.src。
     }
 
     pause() {
