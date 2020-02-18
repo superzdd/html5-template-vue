@@ -100,7 +100,7 @@ export default {
                 imageArray: [],
                 fps: 30,
                 startPlay: false,
-                loop: false,
+                loop: true,
                 reversePlay: false,
                 pause: false,
             },
