@@ -8,6 +8,10 @@
         </BasePage>
         <BasePage :class="pageClass(2)">
             <div class="page2-bg">
+                <HButton class="button" @click="butClick">Test</HButton>
+                <HButton :showLoading="true" @click="but2Click">Test2</HButton>
+                <HButton :disabled="true" @click="but2Click">Test3</HButton>
+                <HButton type="image" src="./imgs/music-off.png" @click="but2Click">Test4</HButton>
                 <MovieClip
                     class="movie-clip-demo"
                     :imageArray="movieClipInfo.imageArray"
@@ -76,6 +80,7 @@ import MovieClip from './components/MovieClip.vue';
 import UploadPage from './components/UploadPage.vue';
 import BgMusicHint from './components/BgMusicHint.vue';
 import ShakePage from './components/ShakePage.vue';
+import HButton from './components/HButton.vue';
 export default {
     name: 'app',
     components: {
@@ -86,9 +91,11 @@ export default {
         UploadPage,
         BgMusicHint,
         ShakePage,
+        HButton,
     },
     data: function() {
         return {
+            buttonLoading: false,
             sharedState: window.store.state,
             backgroundMusicAutoPlay: true,
             bgMusic: null,
@@ -146,6 +153,12 @@ export default {
         // wxShare();
     },
     methods: {
+        butClick() {
+            console.log('button clicked!');
+        },
+        but2Click() {
+            console.log('button2 clicked!');
+        },
         handleLoadComplete() {
             this.assetsLoaded = true;
             // 素材加载完毕后，要同时确认用户有没有确认背景音乐的情况，同时确认才能前往下一页
