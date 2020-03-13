@@ -8,10 +8,15 @@
         </BasePage>
         <BasePage :class="pageClass(2)">
             <div class="page2-bg">
-                <HButton class="button" @click="butClick">Test</HButton>
-                <HButton :showLoading="true" @click="but2Click">Test2</HButton>
-                <HButton :disabled="true" @click="but2Click">Test3</HButton>
-                <HButton type="image" src="./imgs/music-off.png" @click="but2Click">Test4</HButton>
+                <herdsric-button :show-loading="buttonLoading" @click="butClick">test</herdsric-button>
+                <herdsric-button :show-loading="buttonLoading" @click="but2Click">Test2</herdsric-button>
+                <herdsric-button :disabled="true" @click="but2Click">Test3</herdsric-button>
+                <herdsric-button
+                    :show-loading="buttonLoading"
+                    type="image"
+                    src="./imgs/music-off.png"
+                    @click="but2Click"
+                >Test4</herdsric-button>
                 <MovieClip
                     class="movie-clip-demo"
                     :imageArray="movieClipInfo.imageArray"
@@ -80,7 +85,7 @@ import MovieClip from './components/MovieClip.vue';
 import UploadPage from './components/UploadPage.vue';
 import BgMusicHint from './components/BgMusicHint.vue';
 import ShakePage from './components/ShakePage.vue';
-import HButton from './components/HButton.vue';
+import herdsricButton from './components/HButton.vue';
 export default {
     name: 'app',
     components: {
@@ -91,7 +96,7 @@ export default {
         UploadPage,
         BgMusicHint,
         ShakePage,
-        HButton,
+        herdsricButton,
     },
     data: function() {
         return {
@@ -154,10 +159,20 @@ export default {
     },
     methods: {
         butClick() {
+            this.buttonLoading = true;
             console.log('button clicked!');
+            setTimeout(() => {
+                this.buttonLoading = false;
+                console.log('button click completed!');
+            }, 2000);
         },
         but2Click() {
             console.log('button2 clicked!');
+            this.buttonLoading = true;
+            setTimeout(() => {
+                this.buttonLoading = false;
+                console.log('button2 click completed!');
+            }, 2000);
         },
         handleLoadComplete() {
             this.assetsLoaded = true;

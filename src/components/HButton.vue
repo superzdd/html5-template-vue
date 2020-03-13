@@ -18,7 +18,7 @@
 </template>
 <script>
 export default {
-    name: 'hbutton',
+    name: 'herdsric-button', //herdric button
     data() {
         return {
             isLoading: false || this.showLoading,
@@ -32,50 +32,21 @@ export default {
         src: String,
         text: String,
         actionType: String,
-        showLoading: Boolean, //true,{delay:1000}
+        showLoading: [Boolean, Object], //true,{delay:1000}
         link: [String, Object],
         delay: [Boolean, Number],
     },
     methods: {
-        debounce(func, wait, immediate) {
-            let timeout;
-            return function() {
-                let context = this;
-                let args = arguments;
-
-                if (timeout) clearTimeout(timeout);
-                if (immediate) {
-                    var callNow = !timeout;
-                    timeout = setTimeout(() => {
-                        timeout = null;
-                    }, wait);
-                    if (callNow) func.apply(context, args);
-                } else {
-                    timeout = setTimeout(function() {
-                        func.apply(context, args);
-                    }, wait);
-                }
-            };
-        },
         handleClick(event) {
-            console.log(
-                `handleClick,the isLoading value is ${this.isLoading},disabled value is ${this.disabled}...`
-            );
             if (this.isLoading || this.disabled) {
                 console.log(`click not`);
                 return;
             }
-            console.log(`click yes`);
-
-            this.isLoading = true;
             this.$emit('click', event);
         },
     },
     watch: {
         showLoading(val, preVal) {
-            console.log(
-                `watching the showLoading,the new value is ${val},old value is ${preVal}...`
-            );
             if (preVal && typeof preVal !== 'boolean') {
                 clearTimeout(this.delayTimeout);
             }
@@ -178,10 +149,7 @@ $button-active-bg-color: #dedede;
     &:focus {
         outline: 0;
     }
-    img:not(.img-btn-disabled):active {
-        color: $button-active-font-color;
-        background-color: $button-active-bg-color;
-    }
+
     .img-btn-disabled {
         -webkit-filter: grayscale(100%);
         -moz-filter: grayscale(100%);
@@ -191,7 +159,7 @@ $button-active-bg-color: #dedede;
         filter: gray;
     }
     .img-btn-loading {
-        background: rgba(0, 0, 0, 0.3);
+        background: rgba(255, 255, 255, 0.3);
         width: 100%;
         height: 100%;
         top: 0;
