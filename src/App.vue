@@ -8,8 +8,8 @@
         </BasePage>
         <BasePage :class="pageClass(2)">
             <div class="page2-bg">
-                <herdsric-button :show-loading="buttonLoading" @click="butClick">test</herdsric-button>
-                <herdsric-button :show-loading="buttonLoading" @click="but2Click">Test2</herdsric-button>
+                <herdsric-button border-color="#ffffff" class="herdsric-button" :show-loading="buttonLoading" @click="butClick">test</herdsric-button>
+                <herdsric-button  @click="but2Click">Test2</herdsric-button>
                 <herdsric-button :disabled="true" @click="but2Click">Test3</herdsric-button>
                 <herdsric-button
                     :show-loading="buttonLoading"
@@ -27,6 +27,13 @@
                     :pause="movieClipInfo.pause"
                     @frameEnd="playToEnd"
                 ></MovieClip>
+                <herdsric-button class="herdsric-button" :show-loading="buttonLoading" @click="movieClipPlayClickHandler">
+                    {{
+                    movieClipInfo.startPlay
+                    ? '点击暂停序列帧'
+                    : '点击开始序列帧'
+                    }}
+                </herdsric-button>
                 <div class="page-hint" @click="movieClipPlayClickHandler">
                     {{
                     movieClipInfo.startPlay
@@ -294,7 +301,13 @@ body {
     text-align: center;
     color: #2c3e50;
 }
-
+.herdsric-button{
+    background: #1A1E23;
+    //border-color: hsl(190, 100%, 41%);
+    color: hsl(190, 100%, 41%);
+    width:120px;
+    margin:10px;
+}
 .common-bg {
     position: absolute;
     width: 100%;

@@ -1,14 +1,16 @@
 <template>
-    <button
-        v-if="type=='css'"
-        class="btn"
-        :class="classes"
-        :disabled="disabled"
-        @click="handleClick"
-    >
-        <i class="loading" v-if="isLoading"></i>
-        <slot>{{ text }}</slot>
-    </button>
+    <ButtonFrame :color="borderColor" v-if="type=='css'" :class="classes">
+        <button
+            class="btn"
+            :class="classes"
+            :disabled="disabled"
+            @click="handleClick"
+        >
+            <i class="loading" v-if="isLoading"></i>
+            <slot>{{ text }}</slot>
+        </button>
+       
+    </ButtonFrame>
     <div v-else class="img-btn">
         <div v-if="isLoading" class="img-btn-loading">
             <i class="loading"></i>
@@ -17,11 +19,15 @@
     </div>
 </template>
 <script>
+import ButtonFrame from './HButtonFrame'  
 export default {
     name: 'herdsric-button', //herdric button
+    components: {
+        ButtonFrame
+    },
     data() {
         return {
-            isLoading: false || this.showLoading,
+            isLoading: false || this.showLoading
         };
     },
     props: {
@@ -35,6 +41,7 @@ export default {
         showLoading: [Boolean, Object], //true,{delay:1000}
         link: [String, Object],
         delay: [Boolean, Number],
+        borderColor:String,
     },
     methods: {
         handleClick(event) {
@@ -47,6 +54,7 @@ export default {
     },
     watch: {
         showLoading(val, preVal) {
+            console.log(`watching showLoaindg:${val}`)
             if (preVal && typeof preVal !== 'boolean') {
                 clearTimeout(this.delayTimeout);
             }
@@ -57,6 +65,7 @@ export default {
             } else {
                 this.isLoading = !!val;
             }
+            
         },
     },
     beforeDestroy() {
@@ -82,7 +91,7 @@ $FontEN: -apple-system-font, 'Helvetica Neue';
 $FontCN: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei';
 $FontSans: sans-serif;
 $FontDefault: $FontEN, $FontSans;
-$button-border-radius: 5px;
+$button-border-radius: 0;
 $button-width: 100px;
 $button-height: 42px;
 $button-font-size: 18px;
@@ -96,45 +105,40 @@ $button-bg-color: #f8f8f8;
 $button-active-bg-color: #dedede;
 
 .btn {
-    font-family: $FontDefault;
-    width: $button-width;
-    height: $button-height;
-    position: relative;
+    width:100%;
+    height:100%;
     display: block;
-    margin-top: 10px;
-    margin-left: auto;
-    margin-right: auto;
-    padding-left: 14px;
-    padding-right: 14px;
-    box-sizing: border-box;
-    font-size: $button-font-size;
+    position: absolute;
+    font-family: $FontDefault;
     text-align: center;
     text-decoration: none;
-    color: $button-font-color;
-    background: $button-bg-color;
+    color:inherit;
+    background-color: inherit;
     line-height: unit($button-height/$button-font-size);
-    border-radius: $button-border-radius;
-    overflow: hidden;
+    //overflow: hidden;
     border-width: 0;
     outline: 0;
-    -webkit-appearance: none;
-    -o-user-select: none;
-    -moz-user-select: none; /*火狐 firefox*/
-    -webkit-user-select: none; /*webkit浏览器*/
-    -ms-user-select: none; /*IE10+*/
-    -khtml-user-select: none; /*早期的浏览器*/
+    appearance: none;
     user-select: none;
+    white-space: nowrap;
+    border-radius: inherit;
+    padding:0;
+    &:hover {
+        -webkit-tap-highlight-color: rgba(0,0,0,0); 
+    }
     &:focus {
         outline: 0;
     }
     &:not(.btn-disabled):active {
-        color: $button-active-font-color;
-        background-color: $button-active-bg-color;
+        //color: $button-active-font-color;
+        transform: scale(0.95);
+        box-shadow: 0 0 5px 5px rgba(255, 255, 255,0.5);
     }
     &.btn-disabled {
         color: $button-disabled-font-color;
         background-color: $button-disabled-bg-color;
     }
+    
 }
 .img-btn {
     position: relative;
