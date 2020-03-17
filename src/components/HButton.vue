@@ -27,7 +27,7 @@ export default {
     },
     data() {
         return {
-            isLoading: false || this.showLoading
+            isLoading: false || this.showLoading,
         };
     },
     props: {
@@ -132,7 +132,7 @@ $button-active-bg-color: #dedede;
     &:not(.btn-disabled):active {
         //color: $button-active-font-color;
         transform: scale(0.95);
-        box-shadow: 0 0 5px 5px rgba(255, 255, 255,0.5);
+        
     }
     &.btn-disabled {
         color: $button-disabled-font-color;
