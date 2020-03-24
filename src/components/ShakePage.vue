@@ -93,7 +93,7 @@ export default {
             }
         },
         deviceMotionHandler(e) {
-            console.log('shake page: deviceMotionHandler triggered');
+            // console.log('shake page: deviceMotionHandler triggered');
             let acc = e.accelerationIncludingGravity;
             // let speed = this.deviceMotionSpeedThreshold;
             let curTime = Date.now();
@@ -107,13 +107,13 @@ export default {
             let x = acc.x;
             let y = acc.y;
             let z = acc.z;
-            console.log(
-                `shake page: deviceMotionHandler triggered, ${JSON.stringify({
-                    x,
-                    y,
-                    z,
-                })}`
-            );
+            // console.log(
+            //     `shake page: deviceMotionHandler triggered, ${JSON.stringify({
+            //         x,
+            //         y,
+            //         z,
+            //     })}`
+            // );
 
             let speed =
                 (Math.abs(

@@ -1,15 +1,20 @@
 <template>
     <div id="app" class="page">
         <PageLoading v-if="pageLoadingShow" @loadComplete="handleLoadComplete"></PageLoading>
-        <BasePage :class="pageClass(1)" @commonclick="nextPageClick">
+        <BasePage id="page-1" :class="pageClass(1)" @commonclick="nextPageClick">
             <div class="page1-bg">
                 <div class="page-hint">Page 1, click go to next page</div>
             </div>
         </BasePage>
         <BasePage :class="pageClass(2)">
             <div class="page2-bg">
-                <herdsric-button border-color="#ffffff" class="herdsric-button" :show-loading="buttonLoading" @click="butClick">test</herdsric-button>
-                <herdsric-button  @click="but2Click">Test2</herdsric-button>
+                <herdsric-button
+                    border-color="#ffffff"
+                    class="herdsric-button"
+                    :show-loading="buttonLoading"
+                    @click="butClick"
+                >test</herdsric-button>
+                <herdsric-button @click="but2Click">Test2</herdsric-button>
                 <herdsric-button :disabled="true" @click="but2Click">Test3</herdsric-button>
                 <herdsric-button
                     :show-loading="buttonLoading"
@@ -27,7 +32,11 @@
                     :pause="movieClipInfo.pause"
                     @frameEnd="playToEnd"
                 ></MovieClip>
-                <herdsric-button class="herdsric-button" :show-loading="buttonLoading" @click="movieClipPlayClickHandler">
+                <herdsric-button
+                    class="herdsric-button"
+                    :show-loading="buttonLoading"
+                    @click="movieClipPlayClickHandler"
+                >
                     {{
                     movieClipInfo.startPlay
                     ? '点击暂停序列帧'
@@ -55,7 +64,11 @@
                     : '切换到倒序播放'
                     }}
                 </div>
-                <div class="page-hint" @click="nextPageClick">Page 2, click go to next page</div>
+                <div
+                    id="page-hint"
+                    class="page-hint"
+                    @click="nextPageClick"
+                >Page 2, click go to next page</div>
             </div>
         </BasePage>
         <!-- <BasePage :class="pageClass(3)" @commonclick="nextPageClick">
@@ -78,7 +91,7 @@
 </template>
 
 <script>
-import baiduStatistics from './util/baidu-statistics.js';
+// import baiduStatistics from './util/baidu-statistics.js';
 import navi from './util/nav-controller.js';
 import { getWindowSize } from './util/rem.js';
 import pageTurningManager from './util/page-turning-manager.js';
@@ -93,6 +106,7 @@ import UploadPage from './components/UploadPage.vue';
 import BgMusicHint from './components/BgMusicHint.vue';
 import ShakePage from './components/ShakePage.vue';
 import herdsricButton from './components/HButton.vue';
+import statisticAll from './util/herdsric-statistic.js';
 export default {
     name: 'app',
     components: {
@@ -146,7 +160,7 @@ export default {
     },
     created: function() {
         this.pageTurningManager.turnToPage(0);
-        this.initBadiduStatistics();
+        // this.initBadiduStatistics();
         if (this.backgroundMusicAutoPlay) {
             this.initBackgroundMusic();
         }
@@ -191,7 +205,8 @@ export default {
                 this.pageTurningManager.turnToPage(1, 500);
             }
         },
-        nextPageClick() {
+        nextPageClick(event) {
+            statisticAll('nextPageClick', event.target.id);
             this.pageTurningManager.turnToNextPageAutomatically();
         },
         isCurrentPage(i) {
@@ -223,9 +238,9 @@ export default {
             }
         },
         initBadiduStatistics() {
-            baiduStatistics.init('abcdefg');
-            baiduStatistics.output();
-            baiduStatistics.push('h5-tmpl-vue', 'test');
+            // baiduStatistics.init('abcdefg');
+            // baiduStatistics.output();
+            // baiduStatistics.push('h5-tmpl-vue', 'test');
         },
         backgroundMusicPauseHandler() {
             window.store.setBackgroundMusicPause();
@@ -277,8 +292,8 @@ export default {
             this.userBgMusicConfirmed = true;
             this.checkAndGoFirstPage();
         },
-        uploadPageNextPageHandler() {
-            this.nextPageClick();
+        uploadPageNextPageHandler(event) {
+            this.nextPageClick(event);
         },
         shakePageNextPageHandler() {
             this.pageTurningManager.turnToPage(1, 500);
@@ -301,12 +316,12 @@ body {
     text-align: center;
     color: #2c3e50;
 }
-.herdsric-button{
-    background: #1A1E23;
+.herdsric-button {
+    background: #1a1e23;
     //border-color: hsl(190, 100%, 41%);
     color: hsl(190, 100%, 41%);
-    width:120px;
-    margin:10px;
+    width: 120px;
+    margin: 10px;
 }
 .common-bg {
     position: absolute;

@@ -77,8 +77,8 @@ export default {
                 }
             }
         },
-        nextPageHandler: function() {
-            this.$emit('nextPage');
+        nextPageHandler: function(event) {
+            this.$emit('nextPage', event);
         },
     },
 };

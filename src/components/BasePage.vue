@@ -1,9 +1,7 @@
 <template>
-    <div class="page" @click="$emit('commonclick')">
+    <div class="page" @click="pageClick">
         <slot>
-            <div class="page page-common-default">
-                This is default page, click go to next page
-            </div>
+            <div class="page page-common-default">This is default page, click go to next page</div>
         </slot>
     </div>
 </template>
@@ -13,6 +11,11 @@ export default {
     name: 'pagecommon',
     data: function() {
         return {};
+    },
+    methods: {
+        pageClick(event) {
+            this.$emit('commonclick', event);
+        },
     },
 };
 </script>
