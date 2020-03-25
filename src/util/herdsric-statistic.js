@@ -1,12 +1,12 @@
 /**
  * 统一的统计方法，同时调用谷歌统计，百度统计
- * action：用户跟目标交互的行为，如”播放”、”暂停”、”下载”等等。该项必选。
- * label：事件的一些额外信息，通常可以是歌曲的名称、软件的名称、链接的名称等等。该项可选。
- * opt: 选项配置
- * opt.category：分类，默认值位'general'，一般不用传。如果项目需要区分渠道信息，可以将渠道名给这个字段
- * opt.value：事件的一些数值信息，比如权重、时长、价格等等。
- * opt.g: 是否要提交谷歌统计，默认为true
- * opt.b: 是否要提交百度统计，默认为true
+ * @param {string} action 用户跟目标交互的行为，如”播放”、”暂停”、”下载”等等。该项必选。
+ * @param {string} label 事件的一些额外信息，通常可以是歌曲的名称、软件的名称、链接的名称等等。该项可选。
+ * @param {Object=} opt 选项配置
+ * @param {string=} opt.category：分类，默认值位'general'，一般不用传。如果项目需要区分渠道信息，可以将渠道名给这个字段
+ * @param {number=} opt.value：事件价值，非负整数
+ * @param {boolean=} opt.g: 是否要提交谷歌统计，默认为true
+ * @param {boolean=} opt.b: 是否要提交百度统计，默认为true
  */
 let statisticsAll = function(action, label, opt = null) {
     let option = {

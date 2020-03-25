@@ -65,7 +65,7 @@
                     }}
                 </div>
                 <div
-                    id="page-hint"
+                    id="page-2"
                     class="page-hint"
                     @click="nextPageClick"
                 >Page 2, click go to next page</div>
