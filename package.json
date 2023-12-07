@@ -52,5 +52,10 @@
     "browserslist": [
         "> 1%",
         "last 2 versions"
-    ]
+    ],
+    "description": "## 项目简介",
+    "main": ".prettierrc.js",
+    "keywords": [],
+    "author": "",
+    "license": "ISC"
 }

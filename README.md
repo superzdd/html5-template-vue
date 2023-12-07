@@ -23,10 +23,39 @@
 -   [x] 过场动画以及页面管理工具
 -   [x] 序列帧组件 MovieClip.vue
 
+## npm 说明
+
+### node 版本降级
+
+**务必使用 node v8.17.0 版本**
+
+时过境迁，此项目创建于 2019 年前后，目前无法依赖最新版 node 运行。即使升级 node，也会导致其他依赖包报错
+
+推荐版本如下：
+
+```
+html5-template-vue % node -v
+v8.17.0
+html5-template-vue % npm -v
+6.13.4
+```
+
+请使用 nvm use 命令切换到**node 8**
+
+```
+nvm use 8
+```
+
+如果你还没有安装 nvm，请参考以下链接进行 nvm 的安装
+
+-   [如何在 macOS 上安装 NVM](https://juejin.cn/post/7083026831263137800)
+-   [brew 安装 nvm 后无法使用 nvm 命令](https://blog.csdn.net/cainiao1412/article/details/124016883)
+    > macOS Sonoma 14.1.2 需要在~/.zshrc 中去更新 nvm 的环境变量
+
 ## Project setup
 
 ```
-npm install
+npm i -D
 ```
 
 ### Compiles and hot-reloads for development
